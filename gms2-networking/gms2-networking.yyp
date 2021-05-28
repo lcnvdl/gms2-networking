@@ -8,7 +8,13 @@
     {"id":{"name":"math","path":"scripts/math/math.yy",},"order":3,},
     {"id":{"name":"struct_extension","path":"scripts/struct_extension/struct_extension.yy",},"order":4,},
     {"id":{"name":"queue_extension","path":"scripts/queue_extension/queue_extension.yy",},"order":3,},
+    {"id":{"name":"how to use","path":"notes/how to use/how to use.yy",},"order":0,},
+    {"id":{"name":"nw_sender","path":"scripts/nw_sender/nw_sender.yy",},"order":3,},
     {"id":{"name":"instance_extensions","path":"scripts/instance_extensions/instance_extensions.yy",},"order":2,},
+    {"id":{"name":"nw_network_manager","path":"objects/nw_network_manager/nw_network_manager.yy",},"order":0,},
+    {"id":{"name":"nw_engine_gml","path":"scripts/nw_engine_gml/nw_engine_gml.yy",},"order":2,},
+    {"id":{"name":"nw_enums","path":"scripts/nw_enums/nw_enums.yy",},"order":0,},
+    {"id":{"name":"nw_sync_variable","path":"scripts/nw_sync_variable/nw_sync_variable.yy",},"order":4,},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},"order":0,},
   ],
   "Options": [
@@ -45,6 +51,9 @@
     {"folderPath":"folders/Scripts/Gms2_Common.yy","order":1,"resourceVersion":"1.0","name":"Gms2_Common","tags":[],"resourceType":"GMFolder",},
     {"folderPath":"folders/Scripts/Gms2_Common/Collections.yy","order":1,"resourceVersion":"1.0","name":"Collections","tags":[],"resourceType":"GMFolder",},
     {"folderPath":"folders/Scripts/Gms2_Networking.yy","order":2,"resourceVersion":"1.0","name":"Gms2_Networking","tags":[],"resourceType":"GMFolder",},
+    {"folderPath":"folders/Objects/Gms2_Networking.yy","order":1,"resourceVersion":"1.0","name":"Gms2_Networking","tags":[],"resourceType":"GMFolder",},
+    {"folderPath":"folders/Notes/Gms2_Networking.yy","order":1,"resourceVersion":"1.0","name":"Gms2_Networking","tags":[],"resourceType":"GMFolder",},
+    {"folderPath":"folders/Objects/Gms2_Networking_Example.yy","order":2,"resourceVersion":"1.0","name":"Gms2_Networking_Example","tags":[],"resourceType":"GMFolder",},
   ],
   "AudioGroups": [
     {"targets":-1,"resourceVersion":"1.3","name":"audiogroup_default","resourceType":"GMAudioGroup",},

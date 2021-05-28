@@ -1,0 +1,12 @@
+1. Create a new object
+
+1. Add the object `nw_network_manager` into a room.
+
+1. Select the Networking Engine by using `getGmlNetworkEngine()`
+
+	Note:	You can implement your own Network Engine by returning a struct with the same members.
+			
+			In my game, I'm using an engine called Http2 (pure sockets, by using a dll).
+			
+2. 
+			
