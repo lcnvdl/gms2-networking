@@ -48,6 +48,24 @@ function cm_Sender() constructor {
 	
 	static AddSyncVar = function(variable) {
 		ds_list_add(syncVariables, variable);	
+		return variable;
+	};
+	
+	static AddSyncVarInt = function(name, delta) {
+		var syncVar = new cm_SyncVariable(name, SV_INTEGER);
+		syncVar.SetDelta(delta);
+		return AddSyncVar(syncVar);
+	};
+	
+	static AddSyncVarNumber = function(name, delta) {
+		var syncVar = new cm_SyncVariable(name, SV_INTEGER);
+		syncVar.SetDelta(delta);
+		return AddSyncVar(syncVar);
+	};
+	
+	static AddSyncVarBoolean = function(name) {
+		var syncVar = new cm_SyncVariable(name, SV_BOOLEAN);
+		return AddSyncVar(syncVar);
 	};
 	
 	static GetSyncVar = function(varName) {

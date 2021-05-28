@@ -5,6 +5,11 @@ function cm_SyncVariable(_name, _type) constructor {
 	_dirty = false;
 	settings = {};
 	
+	static SetValue = function(v) {
+		value = v;
+		_dirty = true;
+	};
+	
 	static SetSmooth = function(v) {
 		settings[$ "smooth"] = v;	
 	};

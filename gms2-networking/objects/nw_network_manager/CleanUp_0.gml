@@ -3,6 +3,8 @@ engine.destroyBuffer(sendBuffer);
 engine.destroySocket(serverSocket);
 
 //	Senders and receivers
+_sendersMgr.Dispose();
+
 ds_map_foreach(senders, function(sender) {
 	sender.Dispose();
 }, undefined);

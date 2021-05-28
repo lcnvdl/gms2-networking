@@ -1,3 +1,6 @@
+//	Globals
+global.nwNetworkManager = id; // <- Replace this if you want to use another Network Manager implementation.
+
 //	Delta time
 _dt = 0;
 
@@ -21,6 +24,8 @@ clients = ds_list_create();
 clientsInfo = ds_map_create();
 senders = ds_map_create();
 receivers = ds_map_create();
+
+_sendersMgr = new nw_SendersManager();
 
 lastSync = 0;
 syncDelay = 0.5;
@@ -50,32 +55,6 @@ function _createEngineInstance() {
 	sendBuffer = engine.createBuffer(2048, buffer_fixed, 1);	
 }
 
-function _nwMakePackage(info, valuesToSend) {
-	var syncVariables = {};
-	
-	ds_list_foreach(info.syncVariables, function(syncVar, idx, _variables) {
-		var syncVarData = syncVar.Serialize();
-		var finalValue = { type: syncVarData.type };
-		
-		if(variable_struct_exists(syncVarData, "smooth")) {
-			finalValue.smooth = syncVarData.smooth;
-		}
-		else {
-			finalValue.smooth = true;	
-		}
-		
-		_variables[$ syncVarData.name] = finalValue;
-	}, syncVariables);
-	
-	var packageToSend = { 
-		uuid: info.uuid, 
-		object: info.object,
-		syncVariables: syncVariables,
-		variables: valuesToSend
-	};
-	
-	return packageToSend;
-}
 #endregion
 
 #region Receivers
@@ -248,52 +227,31 @@ function _nwUpdateOrCreateReceiver(info, socketOwnerOfSender) {
 #endregion
 
 #region Senders
-function _nwDeleteSender(uuid) {
-	var sender = ds_map_find_value(senders, uuid);
-	if(!is_undefined(sender)) {
-		sender.Dispose();
-		ds_map_delete(senders, uuid);
+
+emitSenderDelete(senderId) {
+	if(serverMode) {
+		nwBroadcast(NwMessageType.syncObjectDelete, { uuid: senderId });
+	}
+	else {
+		//	TODO	Do it with some credentials
+		engine.send(sendBuffer, serverSocket, NwMessageType.syncObjectDelete, { uuid: senderId });
 	}
 }
 
-function _updateSenders() {
-	ds_map_foreach(senders, function(sender, senderId) {		
-		if (!sender.Exists()) {
-			if(serverMode) {
-				nwBroadcast(NwMessageType.syncObjectDelete, { uuid: senderId });
-			}
-			else {
-				//	TODO	Do it with some credentials
-				engine.send(sendBuffer, serverSocket, NwMessageType.syncObjectDelete, { uuid: senderId });
-			}
-			_nwDeleteSender(senderId);
-		}
-		else {
-			_nwSenderEndStep(sender.instance);
-			
-			if(sender.dirty) {
-				var dirtyValues = sender.GetAllDirtyValues(true);
-				
-				var packageToSend = _nwMakePackage(sender, dirtyValues);
-				
-				if(serverMode) {
-					//	TODO Ver de donde sacar X e Y
-					nwBroadcastByDistance(
-						NwMessageType.syncObjectUpdate, 
-						packageToSend, 
-						sender.instance.x,
-						sender.instance.y);
-					// nwBroadcast(NwMessageType.syncObjectUpdate, packageToSend);
-				}
-				else {
-					//	TODO	Do it with some credentials
-					engine.send(sendBuffer, serverSocket, NwMessageType.syncObjectUpdate, packageToSend);
-				}
-			
-				sender.dirty = false;
-			}
-		}
-	}, undefined);
+emitSenderUpdate(packageToSend, senderX, senderY) {
+	if(serverMode) {
+		//	TODO Ver de donde sacar X e Y
+		nwBroadcastByDistance(
+			NwMessageType.syncObjectUpdate, 
+			packageToSend, 
+			senderX,
+			senderY);
+		// nwBroadcast(NwMessageType.syncObjectUpdate, packageToSend);
+	}
+	else {
+		//	TODO	Do it with some credentials
+		engine.send(sendBuffer, serverSocket, NwMessageType.syncObjectUpdate, packageToSend);
+	}
 }
 
 function _nwSenderEndStep(instance) {
@@ -342,82 +300,21 @@ function _nwSenderEndStep(instance) {
 	}, info);
 }
 
-function nwAllSendersSetDirty() {
-	ds_map_foreach(senders, function(sender){
-		sender.SetDirty();
-	}, undefined);
-}
-
 function nwSenderSetDirty(uuid) {
 	var info = ds_map_find_value(senders, uuid);
 	info.SetDirty();
 }
 
-function nwRegisterObjectAsSyncSender(obj, uuid) {
-	obj.nwSender = true;
-	obj.nwUuid = uuid;
-	
-	var sender = new cm_Sender();
-	sender.Initialize(uuid, obj);
-	
-	_addSyncVarInt(sender, "x", 1);
-	_addSyncVarInt(sender, "y", 1);
-	_addSyncVarInt(sender, "depth", 0);
-	_addSyncVarInt(sender, "image_angle", 5);
-	_addSyncVarInt(sender, "image_single", 0);
-	_addSyncVarInt(sender, "sprite_index", 0);
-	_addSyncVarNumber(sender, "image_xscale", 0.01);
-	_addSyncVarNumber(sender, "image_yscale", 0.01);
-	_addSyncVarNumber(sender, "image_alpha", 0.01);
-	_addSyncVar(sender, "visible", "boolean");
+function getSendersManager() {
+	return _sendersMgr;	
+}
 
-	ds_map_set(senders, uuid, sender);
-	
+function nwRegisterObjectAsSyncSender(instance, uuid) {
+	_sendersMgr.Register(instance, uuid);
 	_syncNow();
 }
 
 #endregion // Senders
-
-#region Sync variables
-function _addSyncVarInt(info, name, delta) {
-	var syncVar = new cm_SyncVariable(name, "integer");
-	syncVar.SetDelta(delta);
-	info.AddSyncVar(syncVar);
-}
-
-function _addSyncVar(info, name, type) {
-	var syncVar = new cm_SyncVariable(name, type);
-	info.AddSyncVar(syncVar)
-}
-
-function nwAddSyncVarNumber(uuid, name, delta) {
-	var info = ds_map_find_value(senders, uuid);
-	_addSyncVarNumber(info, name, delta);
-}
-
-function _addSyncVarNumber(info, name, delta) {
-	var syncVar = new cm_SyncVariable(name, "number");
-	syncVar.SetDelta(delta);
-	info.AddSyncVar(syncVar);
-}
-
-function nwGetSyncVar(uuid, name) {
-	var sender = ds_map_find_value(senders, uuid);
-	if (is_undefined(sender)) {
-		return pointer_null;	
-	}
-	
-	return sender.GetSyncVar(name);
-}
-
-function nwSetVarSmooth(uuid, name, enable) {
-	var sVar = nwGetSyncVar(uuid, name);
-	if(sVar != pointer_null) {
-		sVar.SetSmooth(enable);
-	}
-}
-
-#endregion
 
 //	Server
 
