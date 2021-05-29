@@ -12,8 +12,9 @@ function nw_SendersManager() constructor {
 			
 				if(sender.dirty) {
 					var dirtyValues = sender.GetAllDirtyValues(true);
-					var packageToSend = sender.ToPackage(dirtyValues);
-					
+					//	Se hizo staticToPackage en vez de ToPackage por bug de GMS2
+					var packageToSend = sender.staticToPackage(sender, dirtyValues);
+
 					global.nwNetworkManager.emitSenderUpdate(packageToSend, sender.instance.x, sender.instance.y);
 			
 					sender.dirty = false;
@@ -33,7 +34,7 @@ function nw_SendersManager() constructor {
 			}
 			else if (syncVar.name == "y") {
 				if(syncVar.IsDifferent(_sender.instance.y)) {
-					syncVar.SetValue(round(_sender.instance.x));
+					syncVar.SetValue(round(_sender.instance.y));
 					_sender.instance.y = syncVar.value;
 					_sender.dirty = true;
 				}
@@ -73,6 +74,14 @@ function nw_SendersManager() constructor {
 			newUuid = _uuid;
 		}
 		
+		if (!is_string(newUuid)) {
+			throw "The UUID is not a string.";	
+		}
+		
+		if(Exists(newUuid)) {
+			throw "The sender already exists.";	
+		}
+		
 		instance.nwSender = true;
 		instance.nwUuid = newUuid;
 	
@@ -88,20 +97,20 @@ function nw_SendersManager() constructor {
 		sender.AddSyncVarNumber("image_xscale", 0.01);
 		sender.AddSyncVarNumber("image_yscale", 0.01);
 		sender.AddSyncVarNumber("image_alpha", 0.01);
-		sender.AddSyncVarBoolean(sender, "visible");
+		sender.AddSyncVarBoolean("visible");
 
 		ds_map_set(senders, newUuid, sender);
 		
 		return newUuid;
 	};
 	
-	static Exists = function(uuid) {
-		var sender = Get(uuid);
+	static Exists = function(_uuid) {
+		var sender = Get(_uuid);
 		return !is_undefined(sender);
 	};
 	
-	static Get = function(uuid) {
-		return ds_map_find_value(senders, uuid);	
+	static Get = function(_uuid) {
+		return ds_map_find_value(senders, _uuid);	
 	};
 	
 	static GetFromInstance = function(instance) {
@@ -114,11 +123,11 @@ function nw_SendersManager() constructor {
 		}, undefined);
 	};
 	
-	static Delete = function(uuid) {
-		var sender = ds_map_find_value(senders, uuid);
+	static Delete = function(_uuid) {
+		var sender = ds_map_find_value(senders, _uuid);
 		if(!is_undefined(sender)) {
 			sender.Dispose();
-			ds_map_delete(senders, uuid);
+			ds_map_delete(senders, _uuid);
 		}
 	};
 	

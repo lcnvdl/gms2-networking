@@ -1,4 +1,8 @@
 function cm_SyncVariable(_name, _type) constructor {
+	if(!is_string(_name)) {
+		throw "SyncVar name must be a string.";	
+	}
+	
 	name = _name;
 	type = _type;
 	value = undefined;

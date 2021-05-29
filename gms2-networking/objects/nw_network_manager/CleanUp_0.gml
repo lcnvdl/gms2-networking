@@ -13,3 +13,6 @@ _clientsMgr.Dispose();
 
 //	Events
 cleanUpSubscriptions();
+
+//	Finish
+offline = true;

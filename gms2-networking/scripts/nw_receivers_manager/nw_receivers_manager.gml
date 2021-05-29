@@ -12,8 +12,8 @@ function nw_ReceiversManager() constructor {
 		ds_map_destroy(receivers);
 	};
 	
-	static Get = function(uuid) {
-		var receiver = ds_map_find_value(receivers, uuid);
+	static Get = function(_uuid) {
+		var receiver = ds_map_find_value(receivers, _uuid);
 		return receiver;
 	};
 	
@@ -133,41 +133,43 @@ function nw_ReceiversManager() constructor {
 			existing.dirty = true;
 			
 			//	TODO	Assign syncVariables
-			struct_foreach(info.variables, function(varVal, varName, _args) {
-				var _existing = _args.existing;
+			struct_foreach(info.variables, function(varVal, varName, _existing) {
 				var _syncVariables = _existing.syncVariables;
-				
-				var ix = ds_list_findIndex(_syncVariables, function(_syncVar, _varName) {
+				var ix = ds_list_findIndex(_syncVariables, function(_syncVar, __i, _varName) {
 					return _syncVar.name == _varName;
 				}, varName);
+				
+				if (ix == -1) {
+					throw "The variable " + varName + " is missing.";
+				}
 				
 				var syncVar = ds_list_find_value(_syncVariables, ix);
 				syncVar.value = varVal;
 				syncVar.dirty = true;
 				
-				show_debug_message(varName+"="+string(varVal));
+				show_debug_message(varName + "=" + string(varVal));
 				
 				// variable_instance_set(_existing.instance, varName, varVal);
-			}, { existing: existing } );
+			}, existing );
 		}
 	};
 	
-	static Delete = function(uuid) {
-		var receiver = Get(receivers, uuid);
+	static Delete = function(_uuid) {
+		var receiver = Get(receivers, _uuid);
 		if(!is_undefined(receiver)) {
 			ds_list_destroy(receiver.syncVariables);
-			ds_map_delete(receivers, uuid);
+			ds_map_delete(receivers, _uuid);
 		}
 	};
 	
-	static DestroyAndDelete = function(uuid) {
-		var receiver = ds_map_find_value(receivers, uuid);
+	static DestroyAndDelete = function(_uuid) {
+		var receiver = ds_map_find_value(receivers, _uuid);
 		if(!is_undefined(receiver)) {
 			if (instance_exists(receiver.instance)) {
 				instance_destroy(receiver.instance);	
 			}
 			
-			Delete(uuid);
+			Delete(_uuid);
 		}	
 	};
 }

@@ -69,7 +69,7 @@ function cm_Sender() constructor {
 	};
 	
 	static GetSyncVar = function(varName) {
-		var ix = ds_list_findIndex(syncVariables, function(val, _name) {
+		var ix = ds_list_findIndex(syncVariables, function(val, __i, _name) {
 			return val.name == _name;
 		}, varName);
 	
@@ -90,10 +90,10 @@ function cm_Sender() constructor {
 	static EndStep = function(sender) {
 	};
 	
-	static ToPackage = function(variablesToSend) {
+	static staticToPackage = function(_self, variablesToSend) {
 		var reducedSyncVariables = {};
 	
-		ds_list_foreach(syncVariables, function(syncVar, idx, _reducedSyncVariables) {
+		ds_list_foreach(_self.syncVariables, function(syncVar, idx, _reducedSyncVariables) {
 			var data = syncVar.Serialize();
 			var reducedSyncVar = { type: data.type };
 		
@@ -106,10 +106,10 @@ function cm_Sender() constructor {
 		
 			_reducedSyncVariables[$ data.name] = reducedSyncVar;
 		}, reducedSyncVariables);
-	
+		
 		var packageToSend = { 
-			uuid: uuid, 
-			object: object,
+			uuid: _self.uuid, 
+			object: _self.object,
 			syncVariables: reducedSyncVariables,
 			variables: variablesToSend
 		};

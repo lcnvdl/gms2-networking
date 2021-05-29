@@ -26,12 +26,9 @@ _sendersMgr = new nw_SendersManager();
 _receiversMgr = new nw_ReceiversManager();
 
 lastSync = 0;
-syncDelay = 0.5;
 nwCamera = noone
 nwCamX = 0;
 nwCamY = 0;
-
-clientsWillUseCamera = false;
 
 engine = undefined;
 
@@ -46,23 +43,6 @@ function _syncNow() {
 function _createEngineInstance() {
 	engine = global.nwNetworkManagerFactory();
 	sendBuffer = engine.createBuffer(2048, buffer_fixed, 1);	
-}
-
-
-//	DEPRECCATED
-function nwRegisterObjectAsSyncReceiver(obj, uuid) {
-	obj.nwRecv = true;
-	obj.nwUuid = uuid;
-	obj.nwInfo = undefined;
-	
-	var info = { 
-		uuid: uuid, 
-		instance: obj,
-		dirty: true,
-		syncVariables: ds_list_create()
-	};
-	
-	_receiversMgr.Add(info);
 }
 
 function emitSenderDelete(senderId) {
@@ -91,64 +71,15 @@ function emitSenderUpdate(packageToSend, senderX, senderY) {
 	}
 }
 
-function _nwSenderEndStep(instance) {
-	var info = ds_map_find_value(senders, instance.nwUuid);
-	
-	ds_list_foreach(info.syncVariables, function(v, i, _info) {
-		if (v.name == "x") {
-			if(v.IsDifferent(_info.instance.x)) {
-				v.value = round(_info.instance.x);
-				_info.instance.x = v.value;
-				v._dirty = true;
-				_info.dirty = true;
-			}
-		}
-		else if (v.name == "y") {
-			if(v.IsDifferent(_info.instance.y)) {
-				v.value = round(_info.instance.y);
-				_info.instance.y = v.value;
-				v._dirty = true;
-				_info.dirty = true;
-			}
-		}
-		else if (v.name == "image_angle") {
-			if(v.IsDifferent(_info.instance.image_angle)) {
-				v.value = round(_info.instance.image_angle);
-				_info.instance.image_angle = v.value;
-				v._dirty = true;
-				_info.dirty = true;
-			}
-		}
-		else if(variable_instance_exists(_info.instance, v.name)) {
-			var currentValue = variable_instance_get(_info.instance, v.name);
-			if(v.IsDifferent(currentValue)) {
-				if(v.type == "integer") {
-					v.value = round(currentValue);	
-					//	Save the rounded value
-					variable_instance_set(_info.instance, v.name, v.value);
-				}
-				else {
-					v.value = currentValue;
-				}
-				v._dirty = true;
-				_info.dirty = true;
-			}
-		}
-	}, info);
-}
-
-function nwSenderSetDirty(uuid) {
-	var info = ds_map_find_value(senders, uuid);
-	info.SetDirty();
-}
-
 function getSendersManager() {
 	return _sendersMgr;	
 }
 
-function nwRegisterObjectAsSyncSender(instance, uuid) {
-	_sendersMgr.Register(instance, uuid);
+function nwRegisterObjectAsSyncSender(instance, _uuid) {
+	var newId = _sendersMgr.Register(instance, _uuid);
 	_syncNow();
+	
+	return newId;
 }
 
 //	Server
@@ -240,9 +171,9 @@ function onReceiveServerPacket(buffer, socket) {
 }
 
 function _nwDestroyAllInstancesOfClient(socket) {
-	ds_map_foreach(_receiversMgr.receivers, function(receiver, uuid) {
-		global.nwNetworkManager._receiversMgr.DestroyAndDelete(uuid);
-		global.nwNetworkManager.nwBroadcast(NwMessageType.syncObjectUpdate, { uuid: uuid });	
+	ds_map_foreach(_receiversMgr.receivers, function(receiver, _uuid) {
+		global.nwNetworkManager._receiversMgr.DestroyAndDelete(_uuid);
+		global.nwNetworkManager.nwBroadcast(NwMessageType.syncObjectUpdate, { uuid: _uuid });	
 	}, undefined);
 }
 

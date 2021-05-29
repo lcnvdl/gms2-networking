@@ -23,7 +23,7 @@ function ds_list_findIndex(list, fn, args) {
 	var i;
 	for(i = 0; i < ds_list_size(list); i++) {
 		var result = fn(ds_list_find_value(list, i), i, args);
-		if (!is_undefined(result)) {
+		if (!is_undefined(result) && result != pointer_null) {
 			return i;	
 		}
 	}
