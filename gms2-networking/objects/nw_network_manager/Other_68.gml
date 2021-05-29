@@ -1,6 +1,6 @@
 if (serverMode) {
-	nwManageSocketServerEvent(async_load);
+	_manageSocketServerEvent(async_load);
 }
 else {
-	nwManageSocketClientEvent(async_load);	
+	_manageSocketClientEvent(async_load);	
 }

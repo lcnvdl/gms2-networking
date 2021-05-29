@@ -1,3 +1,11 @@
+function nw_start_client() {
+	return global.nwNetworkManager.startClient();	
+}
+
+function nw_start_server() {
+	return global.nwNetworkManager.startServer();	
+}
+
 function nw_add_sender(instance, _uuid) {
 	return global.nwNetworkManager.nwRegisterObjectAsSyncSender(instance, _uuid);
 }

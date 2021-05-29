@@ -1,3 +1,3 @@
-if(nw_is_server()) {
+if (nw_is_server()) {
 	speed = -speed;
 }

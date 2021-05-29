@@ -35,25 +35,56 @@ engine = undefined;
 //	Events
 evListener(id);
 
-//	Global network
-function _syncNow() {
-	lastSync = 0;	
+//	Public functions
+#region Public functions
+
+function startServer() {
+	try {
+		_createEngineInstance();
+		serverSocket = engine.serve(networkSettings.port);
+		serverMode = true;
+		offline = false;
+		evCall("server-connect");
+	}
+	catch(err) {
+		show_error(err, false);
+		serverSocket = -1;
+	}	
 }
 
-function _createEngineInstance() {
-	engine = global.nwNetworkManagerFactory();
-	sendBuffer = engine.createBuffer(2048, buffer_fixed, 1);	
+function startClient() {
+	try {
+		_createEngineInstance();
+		serverSocket = engine.connect(networkSettings.ip, networkSettings.port);
+		serverMode = false;
+		offline = false;
+		evCall("client-connect");
+	}
+	catch(err) {
+		show_error(err, false);
+		serverSocket = -1;
+	}	
 }
 
-function emitSenderDelete(senderId) {
-	if(serverMode) {
-		nwBroadcast(NwMessageType.syncObjectDelete, { uuid: senderId });
-	}
-	else {
-		//	TODO	Do it with some credentials
-		engine.send(sendBuffer, serverSocket, NwMessageType.syncObjectDelete, { uuid: senderId });
-	}
+function nwSetCamera(obj) {
+	nwCamera = obj;
 }
+
+function getSendersManager() {
+	return _sendersMgr;	
+}
+
+function nwRegisterObjectAsSyncSender(instance, _uuid) {
+	var newId = _sendersMgr.Register(instance, _uuid);
+	_syncNow();
+	
+	return newId;
+}
+
+#endregion
+
+//	Internal functions
+#region Internal functions
 
 function emitSenderUpdate(packageToSend, senderX, senderY) {
 	if(serverMode) {
@@ -71,18 +102,15 @@ function emitSenderUpdate(packageToSend, senderX, senderY) {
 	}
 }
 
-function getSendersManager() {
-	return _sendersMgr;	
+function emitSenderDelete(senderId) {
+	if(serverMode) {
+		nwBroadcast(NwMessageType.syncObjectDelete, { uuid: senderId });
+	}
+	else {
+		//	TODO	Do it with some credentials
+		engine.send(sendBuffer, serverSocket, NwMessageType.syncObjectDelete, { uuid: senderId });
+	}
 }
-
-function nwRegisterObjectAsSyncSender(instance, _uuid) {
-	var newId = _sendersMgr.Register(instance, _uuid);
-	_syncNow();
-	
-	return newId;
-}
-
-//	Server
 
 function nwBroadcastByDistance(msgId, data, _x, _y) {
 	show_debug_message("broadcast by distance " + string (msgId) + ":" + json_stringify(data));
@@ -104,6 +132,7 @@ function nwBroadcast(msgId, data) {
 	}, { msgId: msgId, data: data })	
 }
 
+
 function addNewClient(clientSocket) {
 	//	"Global" Calls because of the transaction scope
 	_clientsMgr.Add(clientSocket);
@@ -119,7 +148,21 @@ function _addNewClient(clientSocket) {
 	global.nwNetworkManager.addNewClient(clientSocket);
 }
 
-function nwManageSocketServerEvent(asyncLoad) {
+#endregion
+
+//	Private functions
+#region Private functions
+
+function _syncNow() {
+	lastSync = 0;	
+}
+
+function _createEngineInstance() {
+	engine = global.nwNetworkManagerFactory();
+	sendBuffer = engine.createBuffer(2048, buffer_fixed, 1);	
+}
+
+function _manageSocketServerEvent(asyncLoad) {
 	var eventType = ds_map_find_value(asyncLoad, "type");
 	var eventSocket = ds_map_find_value(asyncLoad, "socket");
 
@@ -137,17 +180,58 @@ function nwManageSocketServerEvent(asyncLoad) {
 	
 		case network_type_data:	{
 			var buffer = ds_map_find_value(asyncLoad, "buffer");
-			onReceiveServerPacket(buffer, eventSocket);
+			_onReceiveServerPacket(buffer, eventSocket);
 		}
 		break;
 	}
 }
 
-function nwSetCamera(obj) {
-	nwCamera = obj;
+
+function _manageSocketClientEvent(asyncLoad) {
+	var eventType = ds_map_find_value(asyncLoad, "type");
+	// var eventSocket = ds_map_find_value(asyncLoad, "socket");
+
+	switch(eventType) {
+		case network_type_data:
+		{
+			var buffer = ds_map_find_value(asyncLoad, "buffer");
+			var pck = engine.receive(buffer);
+			_nwClientProcessPackage(pck);
+		}
+		break;
+		case network_type_disconnect: {
+			show_message("Servidor desconectado!");
+			game_end();
+		}
+		break;
+	}
 }
 
-function onReceiveServerPacket(buffer, socket) {
+function _nwClientProcessPackage(pck) {
+	if (pck.id == NwMessageType.syncPackage) {
+	}
+	else if (pck.id == NwMessageType.syncObjectCreate) {
+	}
+	else if (pck.id == NwMessageType.syncObjectDelete) {
+		_receiversMgr.DestroyAndDelete(pck.data.uuid);
+	}
+	else if (pck.id == NwMessageType.syncObjectUpdate)  {
+		if(!_sendersMgr.Exists(pck.data.uuid)) {
+			_receiversMgr.UpdateOrCreate(pck.data, undefined);
+		}
+	}
+	
+	self.evCallWithArgs("client-receive", pck);
+}
+
+function _nwDestroyAllInstancesOfClient(socket) {
+	ds_map_foreach(_receiversMgr.receivers, function(receiver, _uuid) {
+		global.nwNetworkManager._receiversMgr.DestroyAndDelete(_uuid);
+		global.nwNetworkManager.nwBroadcast(NwMessageType.syncObjectUpdate, { uuid: _uuid });	
+	}, undefined);
+}
+
+function _onReceiveServerPacket(buffer, socket) {
 	var pck = engine.receive(buffer);
 	
 	if (pck.id == NwMessageType.syncObjectCreate) {
@@ -170,55 +254,8 @@ function onReceiveServerPacket(buffer, socket) {
 	self.evCallWithArgs("server-receive", pck);
 }
 
-function _nwDestroyAllInstancesOfClient(socket) {
-	ds_map_foreach(_receiversMgr.receivers, function(receiver, _uuid) {
-		global.nwNetworkManager._receiversMgr.DestroyAndDelete(_uuid);
-		global.nwNetworkManager.nwBroadcast(NwMessageType.syncObjectUpdate, { uuid: _uuid });	
-	}, undefined);
-}
+#endregion	//	Private functions
 
-//	Client
 
-function nwManageSocketClientEvent(asyncLoad) {
-	var eventType = ds_map_find_value(asyncLoad, "type");
-	var eventSocket = ds_map_find_value(asyncLoad, "socket");
 
-	switch(eventType) {
-		case network_type_data:
-		{
-			var buffer = ds_map_find_value(asyncLoad, "buffer");
-			onReceiveClientPacket(buffer, eventSocket);
-		}
-		break;
-		case network_type_disconnect: {
-			show_message("Servidor desconectado!");
-			game_end();
-		}
-		break;
-	}
-}
-
-function onReceiveClientPacket(buffer, socket) {
-	var pck = engine.receive(buffer);
-	
-	_nwClientProcessPackage(pck);
-}
-
-function _nwClientProcessPackage(pck) {
-	if (pck.id == NwMessageType.syncPackage) {
-		
-	}
-	else if (pck.id == NwMessageType.syncObjectCreate) {
-	}
-	else if (pck.id == NwMessageType.syncObjectDelete) {
-		_receiversMgr.DestroyAndDelete(pck.data.uuid);
-	}
-	else if (pck.id == NwMessageType.syncObjectUpdate)  {
-		if(!_sendersMgr.Exists(pck.data.uuid)) {
-			_receiversMgr.UpdateOrCreate(pck.data, undefined);
-		}
-	}
-	
-	self.evCallWithArgs("client-receive", pck);
-}
 

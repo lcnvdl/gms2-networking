@@ -4,7 +4,7 @@
     "path": "folders/Notes/Gms2_Networking.yy",
   },
   "resourceVersion": "1.1",
-  "name": "how to use",
+  "name": "readme",
   "tags": [],
   "resourceType": "GMNotes",
 }

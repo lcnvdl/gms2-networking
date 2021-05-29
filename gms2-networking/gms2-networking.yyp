@@ -15,7 +15,7 @@
     {"id":{"name":"struct_extension","path":"scripts/struct_extension/struct_extension.yy",},"order":4,},
     {"id":{"name":"queue_extension","path":"scripts/queue_extension/queue_extension.yy",},"order":3,},
     {"id":{"name":"code convention","path":"notes/code convention/code convention.yy",},"order":1,},
-    {"id":{"name":"how to use","path":"notes/how to use/how to use.yy",},"order":0,},
+    {"id":{"name":"readme","path":"notes/readme/readme.yy",},"order":0,},
     {"id":{"name":"nw_sender","path":"scripts/nw_sender/nw_sender.yy",},"order":3,},
     {"id":{"name":"instance_extensions","path":"scripts/instance_extensions/instance_extensions.yy",},"order":2,},
     {"id":{"name":"nw_network_manager","path":"objects/nw_network_manager/nw_network_manager.yy",},"order":0,},
