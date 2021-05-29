@@ -12,6 +12,7 @@ if(serverSocket < 0) {
 			_createEngineInstance();
 			serverSocket = engine.connect(networkSettings.ip, networkSettings.port);
 			serverMode = false;
+			offline = false;
 			evCall("client-connect");
 		}
 		catch(err) {
@@ -24,6 +25,7 @@ if(serverSocket < 0) {
 			_createEngineInstance();
 			serverSocket = engine.serve(networkSettings.port);
 			serverMode = true;
+			offline = false;
 			evCall("server-connect");
 		}
 		catch(err) {
@@ -31,8 +33,6 @@ if(serverSocket < 0) {
 			serverSocket = -1;
 		}
 	}
-	
-	offline = false;
 }
 else {
 	if (!is_undefined(engine.evStep)) {

@@ -5,6 +5,7 @@
     {"id":{"name":"view_utils","path":"scripts/view_utils/view_utils.yy",},"order":5,},
     {"id":{"name":"uuid","path":"scripts/uuid/uuid.yy",},"order":4,},
     {"id":{"name":"events_utils","path":"scripts/events_utils/events_utils.yy",},"order":9,},
+    {"id":{"name":"nw_empty_object","path":"objects/nw_empty_object/nw_empty_object.yy",},"order":1,},
     {"id":{"name":"nw_clients_manager","path":"scripts/nw_clients_manager/nw_clients_manager.yy",},"order":7,},
     {"id":{"name":"list_extension","path":"scripts/list_extension/list_extension.yy",},"order":1,},
     {"id":{"name":"array_extension","path":"scripts/array_extension/array_extension.yy",},"order":0,},

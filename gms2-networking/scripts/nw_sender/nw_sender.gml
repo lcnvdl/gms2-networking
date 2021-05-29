@@ -69,7 +69,7 @@ function cm_Sender() constructor {
 	};
 	
 	static GetSyncVar = function(varName) {
-		var ix = ds_list_findIndex(syncVariables, function(_name, val) {
+		var ix = ds_list_findIndex(syncVariables, function(val, _name) {
 			return val.name == _name;
 		}, varName);
 	

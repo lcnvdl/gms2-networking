@@ -96,8 +96,8 @@ function nw_SendersManager() constructor {
 	};
 	
 	static Exists = function(uuid) {
-		var existingAsSender = _sendersMgr.Get(info.uuid);
-		return !is_undefined(existingAsSender);
+		var sender = Get(uuid);
+		return !is_undefined(sender);
 	};
 	
 	static Get = function(uuid) {

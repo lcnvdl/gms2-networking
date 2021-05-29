@@ -23,5 +23,9 @@ function nw_is_server() {
 }
 
 function nw_is_client() {
-	return !nw_is_server();	
+	return nw_is_online() && !nw_is_server();	
+}
+
+function nw_is_online() {
+	return !global.nwNetworkManager.offline;
 }

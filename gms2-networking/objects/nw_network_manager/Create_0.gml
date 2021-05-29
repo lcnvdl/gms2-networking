@@ -65,84 +65,6 @@ function nwRegisterObjectAsSyncReceiver(obj, uuid) {
 	_receiversMgr.Add(info);
 }
 
-function _nwUpdateOrCreateReceiver(info, socketOwnerOfSender) {
-	var existingAsSender = _sendersMgr.Get(info.uuid);
-	
-	if(is_undefined(existingAsSender)) {
-		var existing = ds_map_find_value(receivers, info.uuid);
-		
-		if(is_undefined(existing)) {
-			var objectIdx = asset_get_index(info.object);
-			if (objectIdx < 0) {
-				objectIdx = empty_object_o;	
-			}
-			
-			var instance = instance_create(-100, -100, objectIdx);
-	
-			var recvInfo = {
-				uuid: info.uuid, 
-				instance: instance,
-				object: info.object,
-				dirty: true,
-				syncVariables: ds_list_create()
-			};
-			
-			if(serverMode) {
-				recvInfo.client = socketOwnerOfSender;
-			}
-			
-			struct_foreach(info.syncVariables, function(varVal, varName, _args) {
-				var _recvInfo = _args.recvInfo;
-				var _info = _args.info;
-				var _instance = _args.instance;
-				var _value = _info.variables[$ varName];
-				
-				ds_list_add(_recvInfo.syncVariables, { 
-					name: varName,
-					type: varVal.type,
-					smooth: varVal.smooth,
-					value: _value, 
-					dirty: false });
-				
-				if (is_undefined(_value)) {
-					show_debug_message(varName+" IGNORED (undefined)");
-				}
-				else {
-					show_debug_message(varName+" set to "+string(_value));
-					variable_instance_set(_instance, varName, _value);
-				}
-			}, {recvInfo:recvInfo, info:info, instance: instance});
-			
-			instance.nwRecv = true;			//	Remove?
-			instance.nwUuid = info.uuid;	//	Remove?
-			instance.nwInfo = recvInfo;		//	Remove?
-			
-			ds_map_add(receivers, info.uuid, recvInfo);
-		}
-		else {
-			existing.dirty = true;
-			
-			//	TODO	Assign syncVariables
-			struct_foreach(info.variables, function(varVal, varName, _args) {
-				var _existing = _args.existing;
-				var _syncVariables = _existing.syncVariables;
-				
-				var ix = ds_list_findIndex(_syncVariables, function(_varName, _syncVar) {
-					return _syncVar.name == _varName;
-				}, varName);
-				
-				var syncVar = ds_list_find_value(_syncVariables, ix);
-				syncVar.value = varVal;
-				syncVar.dirty = true;
-				
-				show_debug_message(varName+"="+string(varVal));
-				
-				// variable_instance_set(_existing.instance, varName, varVal);
-			}, { existing: existing } );
-		}
-	}
-}
-
 function emitSenderDelete(senderId) {
 	if(serverMode) {
 		nwBroadcast(NwMessageType.syncObjectDelete, { uuid: senderId });
@@ -257,8 +179,8 @@ function addNewClient(clientSocket) {
 			
 	if (!clientsWillUseCamera) {
 		//	TODO	Ver si quitar
-		nwAllSendersSetDirty();
-		_syncNow();	
+		_sendersMgr.SetAllDirty();
+		_syncNow();
 	}
 }
 
@@ -309,7 +231,9 @@ function onReceiveServerPacket(buffer, socket) {
 		nwBroadcast(pck.id, pck.data);	
 	}
 	else if (pck.id == NwMessageType.syncObjectUpdate)  {
-		_receiversMgr.UpdateOrCreate(pck.data, socket);
+		if(!_sendersMgr.Exists(info.uuid)) {
+			_receiversMgr.UpdateOrCreate(pck.data, socket);
+		}
 	}
 	
 	self.evCallWithArgs("server-receive", pck);
@@ -356,10 +280,12 @@ function _nwClientProcessPackage(pck) {
 	else if (pck.id == NwMessageType.syncObjectCreate) {
 	}
 	else if (pck.id == NwMessageType.syncObjectDelete) {
-		_nwRemoveReceiver(pck.data.uuid);
+		_receiversMgr.DestroyAndDelete(pck.data.uuid);
 	}
 	else if (pck.id == NwMessageType.syncObjectUpdate)  {
-		_nwUpdateOrCreateReceiver(pck.data, undefined);
+		if(!_sendersMgr.Exists(pck.data.uuid)) {
+			_receiversMgr.UpdateOrCreate(pck.data, undefined);
+		}
 	}
 	
 	self.evCallWithArgs("client-receive", pck);

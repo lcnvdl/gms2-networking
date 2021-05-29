@@ -31,19 +31,26 @@ function nw_ReceiversManager() constructor {
 	static Update = function(receiver) {
 		ds_list_foreach(receiver.syncVariables, function(v, i, _info) {
 			if(!is_undefined(v.value)) {
+				var _dt = global.nwNetworkManager._dt;
+				var _syncDelay = global.nwNetworkManager.syncDelay
+				var factor = _dt*2;
+				if (_syncDelay > 0) {
+					factor /= _syncDelay;	
+				}
+				
 				if (v.name == "x") {
 					if(v.value != _info.instance.x){
-						_info.instance.x = damp(_info.instance.x, v.value, max(1, abs(_info.instance.x-v.value)*_dt*2/syncDelay));
+						_info.instance.x = damp(_info.instance.x, v.value, max(1, abs(_info.instance.x-v.value)*factor));
 					}
 				}
 				else if (v.name == "y") {
 					if(v.value != _info.instance.y){
-						_info.instance.y = damp(_info.instance.y, v.value, max(1, abs(_info.instance.y-v.value)*_dt*2/syncDelay));
+						_info.instance.y = damp(_info.instance.y, v.value, max(1, abs(_info.instance.y-v.value)*factor));
 					}
 				}
 				else if (v.name == "image_angle") {
 					if(v.value != _info.instance.image_angle) {
-						_info.instance.image_angle = damp_angle(_info.instance.image_angle, v.value, 360*_dt*2/syncDelay);
+						_info.instance.image_angle = damp_angle(_info.instance.image_angle, v.value, 360*factor);
 					}
 				}
 				else if(variable_instance_exists(_info.instance, v.name)) {
@@ -52,10 +59,10 @@ function nw_ReceiversManager() constructor {
 						var newValue = v.value;
 					
 						if (v.smooth == SmoothType.Number) {
-							newValue = damp(currentValue, newValue, max(1, abs(currentValue-newValue)*_dt*2/syncDelay));
+							newValue = damp(currentValue, newValue, max(1, abs(currentValue-newValue)*factor));
 						}
 						else if (v.smooth == SmoothType.Angle) {
-							newValue = damp_angle(currentValue, newValue, 360*_dt*2/syncDelay);
+							newValue = damp_angle(currentValue, newValue, 360*factor);
 						}
 					
 						variable_instance_set(_info.instance, v.name, newValue);
@@ -68,20 +75,19 @@ function nw_ReceiversManager() constructor {
 		}, receiver);
 	};
 	
-	static UpdateOrCreate = function(info, socketOwnerOfSender) {
-		if(_sendersMgr.Exists(info.uuid)) {
-			return;	
-		}
-		
+	static UpdateOrCreate = function(info, socketOwnerOfSender) {	
 		var existing = Get(info.uuid);
 		
 		if(is_undefined(existing)) {
 			var objectIdx = asset_get_index(info.object);
-			if (objectIdx < 0) {
-				objectIdx = empty_object_o;	
+			if (objectIdx <= 0) {
+				objectIdx = nw_empty_object;	
 			}
 			
-			var instance = instance_create(-100, -100, objectIdx);
+			var existingBrother = instance_find(objectIdx, 0);
+			var currentLayer = (existingBrother == noone) ? global.nwNetworkManager.layer : existingBrother.layer;
+			
+			var instance = instance_create_layer(-100, -100, currentLayer, objectIdx);
 	
 			var recvInfo = {
 				uuid: info.uuid, 
@@ -131,7 +137,7 @@ function nw_ReceiversManager() constructor {
 				var _existing = _args.existing;
 				var _syncVariables = _existing.syncVariables;
 				
-				var ix = ds_list_findIndex(_syncVariables, function(_varName, _syncVar) {
+				var ix = ds_list_findIndex(_syncVariables, function(_syncVar, _varName) {
 					return _syncVar.name == _varName;
 				}, varName);
 				

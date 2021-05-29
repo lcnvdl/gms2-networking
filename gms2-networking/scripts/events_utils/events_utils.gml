@@ -8,7 +8,7 @@ function evListener(instance){
 		}
 
 		function unsubscribe(subscriptionId) {
-			var pos = ds_list_findIndex(subscriptions, function(_subscriptionId, m){
+			var pos = ds_list_findIndex(subscriptions, function(m, _subscriptionId){
 				return m.id == _subscriptionId;
 			}, subscriptionId);
 	
