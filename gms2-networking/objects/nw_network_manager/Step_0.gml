@@ -37,7 +37,7 @@ if(serverSocket < 0) {
 else {
 	if (!is_undefined(engine.evStep)) {
 		engine.evStep(serverSocket, sendBuffer, function(asyncLoad) {
-			if (network_manager_o.serverMode) {
+			if (global.nwNetworkManager.serverMode) {
 				nwManageSocketServerEvent(asyncLoad);
 			}
 			else {

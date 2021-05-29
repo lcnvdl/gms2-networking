@@ -64,20 +64,20 @@ function nw_SendersManager() constructor {
 	};
 	
 	static Register = function(instance, _uuid) {
-		var uuid;
+		var newUuid;
 		
 		if(is_undefined(_uuid)) {
-			uuid = getUuid();	
+			newUuid = getUuid();	
 		}
 		else {
-			uuid = _uuid;
+			newUuid = _uuid;
 		}
 		
 		instance.nwSender = true;
-		instance.nwUuid = uuid;
+		instance.nwUuid = newUuid;
 	
 		var sender = new cm_Sender();
-		sender.Initialize(uuid, instance);
+		sender.Initialize(newUuid, instance);
 	
 		sender.AddSyncVarInt("x", 1);
 		sender.AddSyncVarInt("y", 1);
@@ -90,7 +90,14 @@ function nw_SendersManager() constructor {
 		sender.AddSyncVarNumber("image_alpha", 0.01);
 		sender.AddSyncVarBoolean(sender, "visible");
 
-		ds_map_set(senders, uuid, sender);
+		ds_map_set(senders, newUuid, sender);
+		
+		return newUuid;
+	};
+	
+	static Exists = function(uuid) {
+		var existingAsSender = _sendersMgr.Get(info.uuid);
+		return !is_undefined(existingAsSender);
 	};
 	
 	static Get = function(uuid) {

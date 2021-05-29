@@ -1,5 +1,6 @@
 //	Globals
-global.nwNetworkManager = id; // <- Replace this if you want to use another Network Manager implementation.
+global.nwNetworkManager = id;
+global.nwNetworkManagerFactory = function() { return getGmlNetworkEngine(); };
 
 //	Delta time
 _dt = 0;
@@ -20,12 +21,9 @@ networkSettings = {
 };
 
 //
-clients = ds_list_create();
-clientsInfo = ds_map_create();
-senders = ds_map_create();
-receivers = ds_map_create();
-
+_clientsMgr = new nw_ClientsManager();
 _sendersMgr = new nw_SendersManager();
+_receiversMgr = new nw_ReceiversManager();
 
 lastSync = 0;
 syncDelay = 0.5;
@@ -35,89 +33,21 @@ nwCamY = 0;
 
 clientsWillUseCamera = false;
 
-selectedEngine = 0;
-
-//engine = getNetworkEngine();
-//sendBuffer = engine.createBuffer(2048, buffer_fixed, 1);
+engine = undefined;
 
 //	Events
-
 evListener(id);
 
 //	Global network
-#region Network related functions
 function _syncNow() {
 	lastSync = 0;	
 }
 
 function _createEngineInstance() {
-	engine = getNetworkEngine(selectedEngine);
+	engine = global.nwNetworkManagerFactory();
 	sendBuffer = engine.createBuffer(2048, buffer_fixed, 1);	
 }
 
-#endregion
-
-#region Receivers
-function _updateReceivers() {
-	ds_map_foreach(receivers, function(receiver, receiverId) {
-		if(instance_exists(receiver.instance)) {
-			_nwReceiverEndStep(receiver.instance);
-		}
-		else {
-			_nwDeleteReceiver(receiverId);
-		}
-	}, undefined);
-}
-
-function _nwDeleteReceiver(uuid) {
-	var receiver = ds_map_find_value(receivers, uuid);
-	if(!is_undefined(receiver)) {
-		ds_list_destroy(receiver.syncVariables);
-		ds_map_delete(receivers, uuid);
-	}
-}
-
-function _nwReceiverEndStep(instance) {
-	var info = ds_map_find_value(receivers, instance.nwUuid);
-	
-	ds_list_foreach(info.syncVariables, function(v, i, _info) {
-		if(!is_undefined(v.value)) {
-			if (v.name == "x") {
-				if(v.value != _info.instance.x){
-					_info.instance.x = damp(_info.instance.x, v.value, max(1, abs(_info.instance.x-v.value)*_dt*2/syncDelay));
-				}
-			}
-			else if (v.name == "y") {
-				if(v.value != _info.instance.y){
-					_info.instance.y = damp(_info.instance.y, v.value, max(1, abs(_info.instance.y-v.value)*_dt*2/syncDelay));
-				}
-			}
-			else if (v.name == "image_angle") {
-				if(v.value != _info.instance.image_angle) {
-					_info.instance.image_angle = damp_angle(_info.instance.image_angle, v.value, 360*_dt*2/syncDelay);
-				}
-			}
-			else if(variable_instance_exists(_info.instance, v.name)) {
-				var currentValue = variable_instance_get(_info.instance, v.name);
-				if(currentValue != v.value) {
-					var newValue = v.value;
-					
-					if (v.smooth == SmoothType.Number) {
-						newValue = damp(currentValue, newValue, max(1, abs(currentValue-newValue)*_dt*2/syncDelay));
-					}
-					else if (v.smooth == SmoothType.Angle) {
-						newValue = damp_angle(currentValue, newValue, 360*_dt*2/syncDelay);
-					}
-					
-					variable_instance_set(_info.instance, v.name, newValue);
-				}
-			}
-		}
-		else {
-			show_debug_message(v.name+" IS UNDEFINED!!");	
-		}
-	}, info);
-}
 
 //	DEPRECCATED
 function nwRegisterObjectAsSyncReceiver(obj, uuid) {
@@ -132,22 +62,11 @@ function nwRegisterObjectAsSyncReceiver(obj, uuid) {
 		syncVariables: ds_list_create()
 	};
 	
-	ds_map_set(receivers, uuid, info);
-}
-
-function _nwRemoveReceiver(uuid) {
-	var info = ds_map_find_value(receivers, uuid);
-	if(!is_undefined(info)) {
-		if (instance_exists(info.instance)) {
-			instance_destroy(info.instance);	
-		}
-			
-		_nwDeleteReceiver(uuid);
-	}
+	_receiversMgr.Add(info);
 }
 
 function _nwUpdateOrCreateReceiver(info, socketOwnerOfSender) {
-	var existingAsSender = ds_map_find_value(senders, info.uuid);
+	var existingAsSender = _sendersMgr.Get(info.uuid);
 	
 	if(is_undefined(existingAsSender)) {
 		var existing = ds_map_find_value(receivers, info.uuid);
@@ -224,11 +143,7 @@ function _nwUpdateOrCreateReceiver(info, socketOwnerOfSender) {
 	}
 }
 
-#endregion
-
-#region Senders
-
-emitSenderDelete(senderId) {
+function emitSenderDelete(senderId) {
 	if(serverMode) {
 		nwBroadcast(NwMessageType.syncObjectDelete, { uuid: senderId });
 	}
@@ -238,7 +153,7 @@ emitSenderDelete(senderId) {
 	}
 }
 
-emitSenderUpdate(packageToSend, senderX, senderY) {
+function emitSenderUpdate(packageToSend, senderX, senderY) {
 	if(serverMode) {
 		//	TODO Ver de donde sacar X e Y
 		nwBroadcastByDistance(
@@ -314,40 +229,41 @@ function nwRegisterObjectAsSyncSender(instance, uuid) {
 	_syncNow();
 }
 
-#endregion // Senders
-
 //	Server
 
 function nwBroadcastByDistance(msgId, data, _x, _y) {
 	show_debug_message("broadcast by distance " + string (msgId) + ":" + json_stringify(data));
 	
-	ds_list_foreach(clients, function(client, index, args) {
-		var clientInfo = ds_map_find_value(args.clientsInfo, client);
+	ds_list_foreach(_clientsMgr.clients, function(client, index, args) {
+		var clientInfo = args.mgr.GetInfo(client);
 		
 		if (point_distance(args.X, args.Y, clientInfo.X, clientInfo.Y) <= clientInfo.Range) {
 			engine.send(sendBuffer, client, args.msgId, args.data);
 		}
-	}, { msgId: msgId, data: data, clientsInfo: clientsInfo, X: _x, Y: _y })	
+	}, { msgId: msgId, data: data, mgr: _clientsMgr, X: _x, Y: _y })	
 }
 
 function nwBroadcast(msgId, data) {
 	show_debug_message("broadcast " + string (msgId) + ":" + json_stringify(data));
 	
-	ds_list_foreach(clients, function(client, index, args) {
+	ds_list_foreach(_clientsMgr.clients, function(client, index, args) {
 		engine.send(sendBuffer, client, args.msgId, args.data);
 	}, { msgId: msgId, data: data })	
 }
 
-function _addNewClient(clientSocket) {
+function addNewClient(clientSocket) {
 	//	"Global" Calls because of the transaction scope
-	ds_list_add(network_manager_o.clients, clientSocket);
-	ds_map_add(network_manager_o.clientsInfo, clientSocket, { X: -1, Y: -1, Range: 2000 });
+	_clientsMgr.Add(clientSocket);
 			
-	if (!network_manager_o.clientsWillUseCamera) {
+	if (!clientsWillUseCamera) {
 		//	TODO	Ver si quitar
 		nwAllSendersSetDirty();
 		_syncNow();	
 	}
+}
+
+function _addNewClient(clientSocket) {
+	global.nwNetworkManager.addNewClient(clientSocket);
 }
 
 function nwManageSocketServerEvent(asyncLoad) {
@@ -362,9 +278,7 @@ function nwManageSocketServerEvent(asyncLoad) {
 	
 		case network_type_disconnect: {
 			_nwDestroyAllInstancesOfClient(eventSocket);
-			
-			ds_list_delete(clients, ds_list_find_index(clients, eventSocket));
-			ds_map_delete(clientsInfo, eventSocket);
+			_clientsMgr.Remove(eventSocket);
 		}
 		break;
 	
@@ -386,25 +300,25 @@ function onReceiveServerPacket(buffer, socket) {
 	if (pck.id == NwMessageType.syncObjectCreate) {
 	}
 	else if (pck.id == NwMessageType.syncClientLocation) {
-		var data = ds_map_find_value(clientsInfo, socket);
+		var data = _clientsMgr.GetInfo(socket);
 		data.X = pck.data.X;
 		data.Y = pck.data.Y;
 	}
 	else if (pck.id == NwMessageType.syncObjectDelete) {
-		_nwRemoveReceiver(pck.data.uuid);
+		_receiversMgr.DestroyAndDelete(pck.data.uuid);
 		nwBroadcast(pck.id, pck.data);	
 	}
 	else if (pck.id == NwMessageType.syncObjectUpdate)  {
-		_nwUpdateOrCreateReceiver(pck.data, socket);
+		_receiversMgr.UpdateOrCreate(pck.data, socket);
 	}
 	
 	self.evCallWithArgs("server-receive", pck);
 }
 
 function _nwDestroyAllInstancesOfClient(socket) {
-	ds_map_foreach(receivers, function(receiver, uuid) {
-		network_manager_o._nwRemoveReceiver(uuid);
-		network_manager_o.nwBroadcast(NwMessageType.syncObjectUpdate, { uuid: uuid });	
+	ds_map_foreach(_receiversMgr.receivers, function(receiver, uuid) {
+		global.nwNetworkManager._receiversMgr.DestroyAndDelete(uuid);
+		global.nwNetworkManager.nwBroadcast(NwMessageType.syncObjectUpdate, { uuid: uuid });	
 	}, undefined);
 }
 
