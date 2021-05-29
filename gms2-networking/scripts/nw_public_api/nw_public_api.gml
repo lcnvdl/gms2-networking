@@ -6,6 +6,11 @@ function nw_start_server() {
 	return global.nwNetworkManager.startServer();	
 }
 
+function nw_configure(ip, port) {
+	global.nwNetworkManager.networkSettings.ip = ip;
+	global.nwNetworkManager.networkSettings.port = port;
+}
+
 function nw_add_sender(instance, _uuid) {
 	return global.nwNetworkManager.nwRegisterObjectAsSyncSender(instance, _uuid);
 }
