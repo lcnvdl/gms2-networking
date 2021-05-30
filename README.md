@@ -2,11 +2,11 @@
 Almost-magic Networking System for Game Maker Studio +2.3.
 
 ## Features
-* Auto-magic synchronization between objects. _There is no longer a need to invent new protocols or mess up your code._
-* Smooth synchronization. _Latency is hidden by using a smooth value assignment algorithm._
-* Security layer. _You can add server-side validations to prevent cheating._
-* Independent of the network engine. _You can use a base class to implement your preferred network engine. For my own project I used Http 3 sockets!_
-* You don't need to know how to handle sockets or buffers.
+* **Auto-magic synchronization between objects**. _There is no longer a need to invent new protocols or mess up your code._
+* **Smooth synchronization**. _Latency is hidden by using a smooth value assignment algorithm._
+* **Security layer**. _You can add server-side validations to prevent cheating._
+* **Independent of the network engine**. _You can use a base class to implement your preferred network engine. For my own project I used Http 3 sockets!_
+* **Easy to use**. _You don't need to know how to handle sockets or buffers._
 
 ## Diagram
 ![Class Diagram](https://www.plantuml.com/plantuml/png/VPBHIyCm4CRVyrSSVT912-BR41aEySKfE1W8UxccjpKslOpaDX7rVxTpcJIRsrjw-Trt-RxhA0XwMRTMAMqn17WYUNU-cI3ZadmiJZzOpz0RB2tjIyGL-UGZf4qlfCbiUcKiWtZK0hlxEmnqpql3b8v-c3p6ibgXRhfMoARaEoMOceeo-5GG9SRM4Cj-m5zvHuyTYtVM7briLPxBDz8oGsig5EVLjrBiXC2RPItW5htN3U7LhK4ZWsbNbbfYWSei5kIt9_fbmfmlh6a8Qf7LDGId6v80bRMNnKwuT2AkxPHFFs88yKW127KDeOiTvho9oHTAfTk1cw8upFwOY8iuoyGapn2zGFwvFOvS7MuJylphjgS2Gp1SapSIb4fDG7QLmI3F8HjaqLz7QyU2XZiwDPJoqMtI4VKJBlcdKpQradITNbuYCUh6hLlx0m00)
