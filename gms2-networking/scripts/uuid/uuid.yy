@@ -2,8 +2,8 @@
   "isDnD": false,
   "isCompatibility": false,
   "parent": {
-    "name": "Gms2_Common",
-    "path": "folders/Scripts/Gms2_Common.yy",
+    "name": "Extensions",
+    "path": "folders/Scripts/Gms2_Common/Extensions.yy",
   },
   "resourceVersion": "1.0",
   "name": "uuid",

@@ -70,7 +70,7 @@ function nw_ReceiversManager() constructor {
 				}
 			}
 			else {
-				show_debug_message(v.name+" IS UNDEFINED!!");	
+				show_debug_message(v.name + " IS UNDEFINED!!");	
 			}
 		}, receiver);
 	};

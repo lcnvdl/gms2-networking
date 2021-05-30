@@ -9,3 +9,14 @@ function instance_get_width() {
 function instance_get_height() {
 	return bbox_bottom - bbox_top;
 }
+
+function instance_get_all(objectIndex) {
+	var list = ds_list_create();
+	
+	with (objectIndex)
+	{
+	    ds_list_add(list, id);
+	}
+	
+	return list;
+}

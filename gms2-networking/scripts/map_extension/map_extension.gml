@@ -1,7 +1,5 @@
-function ds_map_foreach(map, fn, _args) {
-	for (var k = ds_map_find_first(map); !is_undefined(k); k = ds_map_find_next(map, k)) {
-	  var v = map[? k];
-	  fn(v, k, _args);
-	}
-}
+// Script assets have changed for v2.3.0 see
+// https://help.yoyogames.com/hc/en-us/articles/360005277377 for more information
+function map_extension(){
 
+}
