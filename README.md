@@ -2,7 +2,7 @@
 Almost-magic Networking System for Game Maker Studio +2.3.
 
 ## Diagram
-![Class Diagram](http://www.plantuml.com/plantuml/png/RP4z2y8m443t_8gGiP31LKIA8YxMGS7zZ4SzZ5T8eYBuumtOGZuS-_hkyk1Q7y25nzqAOy5xkSVm6joj0uOUtGYFRpOdS0HdYnD2lg3BFdm-T423zApmsX9oAE0AF6wu9yOyOzljHYpoCBdGkdosDeg6_quHL1jfdIZ3fDQVPMB8kII-egFWXSW3fPefsSHzgb5ZUxJDm068evt4rlxqCvduxI-yz5IfsqOrNlaB)
+![Class Diagram](https://github.com/lcnvdl/gms2-networking/raw/main/docs/Diagrams/class_diagram.png)
 
 [Diagram code](./docs/Diagrams/class_diagram.txt)
 

@@ -1,17 +1,27 @@
 @startuml
+
 class NetworkManager
 class SyncVariable
 class Sender
 class SendersManager
 class ReceiversManager
-class ClientsManager
-class BaseEngine
+abstract class BaseEngine
 class NetworkGMLEngine
 
-NetworkManager <-- SendersManager
-NetworkManager <-- ReceiversManager
-NetworkManager <-- ClientsManager
-NetworkManager <-- BaseEngine
+package "Server Side" {
+  class ClientsManager
+  class ServerController
+  class ServerSideObjectValidator
+}
+
+note right of BaseEngine: You can implement different engines\n(like http3 sockets dll).
+note bottom of ServerSideObjectValidator: Validates each sync \nvariable.
+
+NetworkManager <.. SendersManager
+NetworkManager <.. ReceiversManager
+NetworkManager <.. ClientsManager
+NetworkManager <.. BaseEngine
+NetworkManager <.. ServerController
 
 NetworkGMLEngine --|> BaseEngine : inherits
 
@@ -20,4 +30,7 @@ SendersManager "1" *-- "*" Sender : contains
 ReceiversManager "1" *-- "*" Receiver : contains
 
 Sender "1" *-- "*" SyncVariable : contains
+
+ServerController "1" *-- "*" ServerSideObjectValidator : contains
+
 @enduml
