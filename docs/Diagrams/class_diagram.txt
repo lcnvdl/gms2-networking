@@ -1,0 +1,23 @@
+@startuml
+class NetworkManager
+class SyncVariable
+class Sender
+class SendersManager
+class ReceiversManager
+class ClientsManager
+class BaseEngine
+class NetworkGMLEngine
+
+NetworkManager <-- SendersManager
+NetworkManager <-- ReceiversManager
+NetworkManager <-- ClientsManager
+NetworkManager <-- BaseEngine
+
+NetworkGMLEngine --|> BaseEngine : inherits
+
+SendersManager "1" *-- "*" Sender : contains
+
+ReceiversManager "1" *-- "*" Receiver : contains
+
+Sender "1" *-- "*" SyncVariable : contains
+@enduml
