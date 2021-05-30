@@ -15,6 +15,18 @@ function nw_add_sender(instance, _uuid) {
 	return global.nwNetworkManager.nwRegisterObjectAsSyncSender(instance, _uuid);
 }
 
+function nw_server_register_validator(objectIndex, fn) {
+	global.nwNetworkManager.getServerController().RegisterValidator(objectIndex, fn);
+}
+
+function nw_server_unregister_validator(objectIndex) {
+	global.nwNetworkManager.getServerController().UnregisterValidator(objectIndex);
+}
+
+function nw_server_clear_validators() {
+	global.nwNetworkManager.getServerController().ClearValidators();
+}
+
 function nw_get_senders_mgr() {
 	return global.nwNetworkManager.getSendersManager();	
 }

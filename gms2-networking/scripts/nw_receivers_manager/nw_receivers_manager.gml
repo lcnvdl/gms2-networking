@@ -75,8 +75,15 @@ function nw_ReceiversManager() constructor {
 		}, receiver);
 	};
 	
-	static UpdateOrCreate = function(info, socketOwnerOfSender) {	
+	static ReceiveDataFromSender = function(info, socketOwnerOfSender) {	
 		var existing = Get(info.uuid);
+		
+		if (global.nwNetworkManager.serverMode) {
+			assert_is_not_undefined(socketOwnerOfSender);
+		}
+		else {
+			assert_is_undefined(socketOwnerOfSender);
+		}
 		
 		if(is_undefined(existing)) {
 			var objectIdx = asset_get_index(info.object);
@@ -101,6 +108,7 @@ function nw_ReceiversManager() constructor {
 				recvInfo.client = socketOwnerOfSender;
 			}
 			
+			//	TODO	Validate values using ServerController
 			struct_foreach(info.syncVariables, function(varVal, varName, _args) {
 				var _recvInfo = _args.recvInfo;
 				var _info = _args.info;
@@ -115,13 +123,13 @@ function nw_ReceiversManager() constructor {
 					dirty: false });
 				
 				if (is_undefined(_value)) {
-					show_debug_message(varName+" IGNORED (undefined)");
+					show_debug_message(varName + " IGNORED (undefined)");
 				}
 				else {
-					show_debug_message(varName+" set to "+string(_value));
+					show_debug_message(varName + " set to " + string(_value));
 					variable_instance_set(_instance, varName, _value);
 				}
-			}, {recvInfo:recvInfo, info:info, instance: instance});
+			}, { recvInfo:recvInfo, info:info, instance: instance });
 			
 			instance.nwRecv = true;			//	Remove?
 			instance.nwUuid = info.uuid;	//	Remove?
@@ -144,6 +152,17 @@ function nw_ReceiversManager() constructor {
 				}
 				
 				var syncVar = ds_list_find_value(_syncVariables, ix);
+				
+				//	Server validators
+				if (nw_is_server() && instance_exists(_existing.instance)) {
+					var svController = global.nwNetworkManager.getServerController();
+					if (!svController.ValidateValue(_existing.instance.object_index, varName, varVal, syncVar.value)) {
+						show_debug_message("New value for " + varName + " rejected by server validator.");
+						return;
+					}
+				}
+				
+				//	New sync var value
 				syncVar.value = varVal;
 				syncVar.dirty = true;
 				

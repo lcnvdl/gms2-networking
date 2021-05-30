@@ -4,6 +4,11 @@ if (!is_undefined(engine)) {
 	engine.destroySocket(serverSocket);
 }
 
+//	Server controller
+if (!is_undefined(_serverController)) {
+	_serverController.Dispose();	
+}
+
 //	Senders and receivers
 _sendersMgr.Dispose();
 _receiversMgr.Dispose();

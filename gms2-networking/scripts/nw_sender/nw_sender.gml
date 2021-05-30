@@ -1,4 +1,4 @@
-function cm_Sender() constructor {
+function nw_Sender() constructor {
 	uuid = "";
 	dirty = false;
 	object = undefined;

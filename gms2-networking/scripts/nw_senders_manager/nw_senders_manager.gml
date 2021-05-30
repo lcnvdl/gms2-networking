@@ -85,7 +85,7 @@ function nw_SendersManager() constructor {
 		instance.nwSender = true;
 		instance.nwUuid = newUuid;
 	
-		var sender = new cm_Sender();
+		var sender = new nw_Sender();
 		sender.Initialize(newUuid, instance);
 	
 		sender.AddSyncVarInt("x", 1);

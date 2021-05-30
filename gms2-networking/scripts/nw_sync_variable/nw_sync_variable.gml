@@ -14,6 +14,7 @@ function cm_SyncVariable(_name, _type) constructor {
 		_dirty = true;
 	};
 	
+	//	TODO	Unused. It needs to be called.
 	static SetSmooth = function(v) {
 		settings[$ "smooth"] = v;	
 	};
@@ -43,7 +44,7 @@ function cm_SyncVariable(_name, _type) constructor {
 	};
 	
 	static IsNumeric = function() {
-		return type == "integer" || type == "number";
+		return type == SV_INTEGER || type == SV_NUMBER;
 	};
 	
 	static IsDifferent = function(instanceValue) {
@@ -56,7 +57,7 @@ function cm_SyncVariable(_name, _type) constructor {
 			if (delta > 0) {
 				return abs(instanceValue - value) >= delta;
 			}
-			else if(type == "integer") {
+			else if(type == SV_INTEGER) {
 				return round(instanceValue) != round(value);	
 			}
 			else {
@@ -65,10 +66,6 @@ function cm_SyncVariable(_name, _type) constructor {
 		}
 		
 		return instanceValue != value;
-	};
-	
-	static Deserialize = function(data) {
-		
 	};
 	
 	static Serialize = function() {

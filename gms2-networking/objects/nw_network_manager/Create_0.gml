@@ -24,6 +24,7 @@ networkSettings = {
 _clientsMgr = new nw_ClientsManager();
 _sendersMgr = new nw_SendersManager();
 _receiversMgr = new nw_ReceiversManager();
+_serverController = undefined;
 
 lastSync = 0;
 nwCamera = noone
@@ -41,6 +42,7 @@ evListener(id);
 function startServer() {
 	try {
 		_createEngineInstance();
+		_serverController = new nw_ServerController();
 		serverSocket = engine.serve(networkSettings.port);
 		serverMode = true;
 		offline = false;
@@ -72,6 +74,10 @@ function nwSetCamera(obj) {
 
 function getSendersManager() {
 	return _sendersMgr;	
+}
+
+function getServerController() {
+	return _serverController;	
 }
 
 function nwRegisterObjectAsSyncSender(instance, _uuid) {
@@ -217,7 +223,7 @@ function _nwClientProcessPackage(pck) {
 	}
 	else if (pck.id == NwMessageType.syncObjectUpdate)  {
 		if(!_sendersMgr.Exists(pck.data.uuid)) {
-			_receiversMgr.UpdateOrCreate(pck.data, undefined);
+			_receiversMgr.ReceiveDataFromSender(pck.data, undefined);
 		}
 	}
 	
@@ -247,7 +253,7 @@ function _onReceiveServerPacket(buffer, socket) {
 	}
 	else if (pck.id == NwMessageType.syncObjectUpdate)  {
 		if(!_sendersMgr.Exists(info.uuid)) {
-			_receiversMgr.UpdateOrCreate(pck.data, socket);
+			_receiversMgr.ReceiveDataFromSender(pck.data, socket);
 		}
 	}
 	

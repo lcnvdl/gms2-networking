@@ -16,6 +16,74 @@ function assert_equals() {
 	}
 }
 
+/// @function assert_is_true(value, message*);
+function assert_is_true() {
+	var current = argument0;
+	var msg;
+	
+	if (argument_count == 2) {
+		msg = argument1;	
+	}
+	else {
+		msg = "Is true assertion failed.";
+	}
+	
+	if (current != true) {
+		throw msg;	
+	}
+}
+
+/// @function assert_is_false(value, message*);
+function assert_is_false() {
+	var current = argument0;
+	var msg;
+	
+	if (argument_count == 2) {
+		msg = argument1;	
+	}
+	else {
+		msg = "Is false assertion failed.";
+	}
+	
+	if (current != false) {
+		throw msg;	
+	}
+}
+
+/// @function assert_is_false(value, message*);
+function assert_is_not_undefined() {
+	var current = argument0;
+	var msg;
+	
+	if (argument_count == 2) {
+		msg = argument1;	
+	}
+	else {
+		msg = "Is not undefined assertion failed.";
+	}
+	
+	if (is_undefined(current)) {
+		throw msg;	
+	}
+}
+
+/// @function assert_is_false(value, message*);
+function assert_is_undefined() {
+	var current = argument0;
+	var msg;
+	
+	if (argument_count == 2) {
+		msg = argument1;	
+	}
+	else {
+		msg = "Is undefined assertion failed.";
+	}
+	
+	if (!is_undefined(current)) {
+		throw msg;	
+	}
+}
+
 /// @function assert_is_string(value, message*);
 function assert_is_string() {
 	var current = argument0;
