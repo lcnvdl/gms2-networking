@@ -1,4 +1,5 @@
 /// @description Updates the senders and receivers
+
 if(serverSocket >= 0) {
 	if(lastSync <= 0) {
 		_sendersMgr.Update();
@@ -8,8 +9,7 @@ if(serverSocket >= 0) {
 		lastSync -= _dt; 	
 	}
 	
-	//	TODO	Normalize the method name (sendersMgr is named Update)
-	_receiversMgr.UpdateAll();
+	_receiversMgr.Update();
 
 	//	Follow camera
 	if(nwCamera != noone) {

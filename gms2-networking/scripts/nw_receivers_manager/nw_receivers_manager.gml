@@ -17,10 +17,10 @@ function nw_ReceiversManager() constructor {
 		return receiver;
 	};
 	
-	static UpdateAll = function() {
+	static Update = function() {
 		ds_map_foreach(receivers, function(receiver, receiverId) {
 			if(instance_exists(receiver.instance)) {
-				Update(receiver);
+				_UpdateReceiver(receiver);
 			}
 			else {
 				Delete(receiverId);
@@ -28,7 +28,7 @@ function nw_ReceiversManager() constructor {
 		}, undefined);
 	};
 	
-	static Update = function(receiver) {
+	static _UpdateReceiver = function(receiver) {
 		ds_list_foreach(receiver.syncVariables, function(v, i, _info) {
 			if(!is_undefined(v.value)) {
 				var _dt = global.nwNetworkManager._dt;
