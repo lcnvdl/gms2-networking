@@ -22,6 +22,7 @@
     {"id":{"name":"nw_server_controller","path":"scripts/nw_server_controller/nw_server_controller.yy",},"order":13,},
     {"id":{"name":"nw_sender","path":"scripts/nw_sender/nw_sender.yy",},"order":3,},
     {"id":{"name":"nw_network_manager","path":"objects/nw_network_manager/nw_network_manager.yy",},"order":0,},
+    {"id":{"name":"nw_engine_http2","path":"scripts/nw_engine_http2/nw_engine_http2.yy",},"order":14,},
     {"id":{"name":"nw_ball_s","path":"sprites/nw_ball_s/nw_ball_s.yy",},"order":0,},
     {"id":{"name":"nw_network_demo_o","path":"objects/nw_network_demo_o/nw_network_demo_o.yy",},"order":0,},
     {"id":{"name":"nw_receiver","path":"scripts/nw_receiver/nw_receiver.yy",},"order":11,},
