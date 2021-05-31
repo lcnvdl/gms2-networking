@@ -7,6 +7,9 @@ function nw_start_server() {
 }
 
 function nw_configure(ip, port) {
+	assert_is_string(ip);
+	assert_is_number(port);
+	
 	global.nwNetworkManager.networkSettings.ip = ip;
 	global.nwNetworkManager.networkSettings.port = port;
 }

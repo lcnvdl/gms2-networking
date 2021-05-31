@@ -16,6 +16,24 @@ function assert_equals() {
 	}
 }
 
+/// @function assert_not_equals(value, expected, message*);
+function assert_not_equals() {
+	var current = argument0;
+	var expected = argument1;
+	var msg;
+	
+	if (argument_count == 3) {
+		msg = argument2;	
+	}
+	else {
+		msg = "Not equals assertion failed.";
+	}
+	
+	if (current == expected) {
+		throw msg;	
+	}
+}
+
 /// @function assert_is_true(value, message*);
 function assert_is_true() {
 	var current = argument0;

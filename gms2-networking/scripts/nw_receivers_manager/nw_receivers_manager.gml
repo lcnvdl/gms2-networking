@@ -147,9 +147,7 @@ function nw_ReceiversManager() constructor {
 					return _syncVar.name == _varName;
 				}, varName);
 				
-				if (ix == -1) {
-					throw "The variable " + varName + " is missing.";
-				}
+				assert_not_equals(ix, -1, "The variable " + varName + " is missing.");
 				
 				var syncVar = ds_list_find_value(_syncVariables, ix);
 				

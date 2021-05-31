@@ -41,6 +41,8 @@ evListener(id);
 
 function startServer() {
 	try {
+		assert_is_true(offline, "The game already has an open connection.");
+		
 		_createEngineInstance();
 		_serverController = new nw_ServerController();
 		serverSocket = engine.serve(networkSettings.port);
@@ -56,6 +58,8 @@ function startServer() {
 
 function startClient() {
 	try {
+		assert_is_true(offline, "The game already has an open connection.");
+		
 		_createEngineInstance();
 		serverSocket = engine.connect(networkSettings.ip, networkSettings.port);
 		serverMode = false;
@@ -87,7 +91,7 @@ function nwRegisterObjectAsSyncSender(instance, _uuid) {
 	return newId;
 }
 
-#endregion
+#endregion	//	Public functions
 
 //	Internal functions
 #region Internal functions
@@ -154,7 +158,7 @@ function _addNewClient(clientSocket) {
 	global.nwNetworkManager.addNewClient(clientSocket);
 }
 
-#endregion
+#endregion	//	Internal functions
 
 //	Private functions
 #region Private functions
@@ -165,7 +169,9 @@ function _syncNow() {
 
 function _createEngineInstance() {
 	engine = global.nwNetworkManagerFactory();
-	sendBuffer = engine.createBuffer(2048, buffer_fixed, 1);	
+	sendBuffer = engine.createBuffer(2048, buffer_fixed, 1);
+	
+	assert_is_false(sendBuffer < 0, "Error creating a buffer.");
 }
 
 function _manageSocketServerEvent(asyncLoad) {
