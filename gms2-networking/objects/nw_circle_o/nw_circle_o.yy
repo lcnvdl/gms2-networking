@@ -30,8 +30,8 @@
   "properties": [],
   "overriddenProperties": [],
   "parent": {
-    "name": "Gms2_Networking_Example",
-    "path": "folders/Objects/Gms2_Networking_Example.yy",
+    "name": "Example_1",
+    "path": "folders/Objects/Gms2_Networking_Examples/Example_1.yy",
   },
   "resourceVersion": "1.0",
   "name": "nw_circle_o",

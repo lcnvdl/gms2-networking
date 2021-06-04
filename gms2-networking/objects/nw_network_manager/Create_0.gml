@@ -155,6 +155,7 @@ function addNewClient(clientSocket) {
 }
 
 function _addNewClient(clientSocket) {
+	assert_is_not_undefined(clientSocket);
 	global.nwNetworkManager.addNewClient(clientSocket);
 }
 
@@ -177,6 +178,10 @@ function _createEngineInstance() {
 function _manageSocketServerEvent(asyncLoad) {
 	var eventType = ds_map_find_value(asyncLoad, "type");
 	var eventSocket = ds_map_find_value(asyncLoad, "socket");
+	
+	if(is_undefined(eventSocket)) {
+		eventSocket = ds_map_find_value(asyncLoad, "id");	
+	}
 
 	switch(eventType) {
 		case network_type_connect: {
@@ -258,8 +263,11 @@ function _onReceiveServerPacket(buffer, socket) {
 		nwBroadcast(pck.id, pck.data);	
 	}
 	else if (pck.id == NwMessageType.syncObjectUpdate)  {
-		if(!_sendersMgr.Exists(info.uuid)) {
+		if(!_sendersMgr.Exists(pck.data.uuid)) {
 			_receiversMgr.ReceiveDataFromSender(pck.data, socket);
+		}
+		else {
+			//	TODO	Update senders	
 		}
 	}
 	

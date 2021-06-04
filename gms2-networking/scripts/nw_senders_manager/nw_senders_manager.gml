@@ -25,41 +25,17 @@ function nw_SendersManager() constructor {
 	
 	static _UpdateSenderInstance = function(sender) {
 		ds_list_foreach(sender.syncVariables, function(syncVar, __i, _sender) {
-			if (syncVar.name == "x") {
-				if(syncVar.IsDifferent(_sender.instance.x)) {
-					syncVar.SetValue(round(_sender.instance.x));
-					_sender.instance.x = syncVar.value;
-					_sender.dirty = true;
-				}
+			if (syncVar.binding == SyncVarBinding.TwoWay) {
+				_sender.UpdateTwoWaySyncVariableFromServer(syncVar);
 			}
-			else if (syncVar.name == "y") {
-				if(syncVar.IsDifferent(_sender.instance.y)) {
-					syncVar.SetValue(round(_sender.instance.y));
-					_sender.instance.y = syncVar.value;
-					_sender.dirty = true;
-				}
+			
+			if (syncVar.binding == SyncVarBinding.Server && !nw_is_server()) {
+				_nw_smooth_update_entity(syncVar, _sender.instance);
 			}
-			else if (syncVar.name == "image_angle") {
-				if(syncVar.IsDifferent(_sender.instance.image_angle)) {
-					syncVar.SetValue(round(_sender.instance.image_angle));
-					_sender.instance.image_angle = syncVar.value;
-					_sender.dirty = true;
-				}
-			}
-			else if(variable_instance_exists(_sender.instance, syncVar.name)) {
-				var currentValue = variable_instance_get(_sender.instance, syncVar.name);
-				if(syncVar.IsDifferent(currentValue)) {
-					if(syncVar.type == SV_INTEGER) {
-						syncVar.SetValue(round(currentValue));	
-						//	Save the rounded value
-						variable_instance_set(_sender.instance, syncVar.name, syncVar.value);
-					}
-					else {
-						syncVar.SetValue(currentValue);
-					}
-					
-					_sender.dirty = true;
-				}
+			
+			if (syncVar.binding == SyncVarBinding.Regular ||
+				syncVar.binding == SyncVarBinding.TwoWay) {
+				_sender.UpdateSyncVariableFromSender(syncVar);
 			}
 		}, sender);
 	};

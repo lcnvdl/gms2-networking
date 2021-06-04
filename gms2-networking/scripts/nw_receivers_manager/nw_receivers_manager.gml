@@ -30,48 +30,7 @@ function nw_ReceiversManager() constructor {
 	
 	static _UpdateReceiver = function(receiver) {
 		ds_list_foreach(receiver.syncVariables, function(v, i, _info) {
-			if(!is_undefined(v.value)) {
-				var _dt = global.nwNetworkManager._dt;
-				var _syncDelay = global.nwNetworkManager.syncDelay
-				var factor = _dt*2;
-				if (_syncDelay > 0) {
-					factor /= _syncDelay;	
-				}
-				
-				if (v.name == "x") {
-					if(v.value != _info.instance.x){
-						_info.instance.x = damp(_info.instance.x, v.value, max(1, abs(_info.instance.x-v.value)*factor));
-					}
-				}
-				else if (v.name == "y") {
-					if(v.value != _info.instance.y){
-						_info.instance.y = damp(_info.instance.y, v.value, max(1, abs(_info.instance.y-v.value)*factor));
-					}
-				}
-				else if (v.name == "image_angle") {
-					if(v.value != _info.instance.image_angle) {
-						_info.instance.image_angle = damp_angle(_info.instance.image_angle, v.value, 360*factor);
-					}
-				}
-				else if(variable_instance_exists(_info.instance, v.name)) {
-					var currentValue = variable_instance_get(_info.instance, v.name);
-					if(currentValue != v.value) {
-						var newValue = v.value;
-					
-						if (v.smooth == SmoothType.Number) {
-							newValue = damp(currentValue, newValue, max(1, abs(currentValue-newValue)*factor));
-						}
-						else if (v.smooth == SmoothType.Angle) {
-							newValue = damp_angle(currentValue, newValue, 360*factor);
-						}
-					
-						variable_instance_set(_info.instance, v.name, newValue);
-					}
-				}
-			}
-			else {
-				show_debug_message(v.name + " IS UNDEFINED!!");	
-			}
+			_nw_smooth_update_entity(v, _info.instance);
 		}, receiver);
 	};
 	

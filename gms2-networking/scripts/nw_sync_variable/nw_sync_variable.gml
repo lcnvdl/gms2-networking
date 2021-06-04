@@ -6,6 +6,7 @@ function cm_SyncVariable(_name, _type) constructor {
 	name = _name;
 	type = _type;
 	value = undefined;
+	binding = SyncVarBinding.Regular;
 	_dirty = false;
 	settings = {};
 	
@@ -16,7 +17,8 @@ function cm_SyncVariable(_name, _type) constructor {
 	
 	//	TODO	Unused. It needs to be called.
 	static SetSmooth = function(v) {
-		settings[$ "smooth"] = v;	
+		settings[$ "smooth"] = v;
+		return self;
 	};
 	
 	static GetDelta = function() {
@@ -28,7 +30,17 @@ function cm_SyncVariable(_name, _type) constructor {
 	};
 	
 	static SetDelta = function(v) {
-		settings[$ "delta"] = v;	
+		settings[$ "delta"] = v;
+		return self;
+	};
+	
+	static GetBinding = function() {
+		return binding;
+	};
+	
+	static SetBinding = function(_binding) {
+		binding = _binding;
+		return self;
 	};
 	
 	static IsDirty = function() {
@@ -37,10 +49,12 @@ function cm_SyncVariable(_name, _type) constructor {
 
 	static SetDirty = function() {
 		_dirty = true;
+		return self;
 	};
 
 	static ClearDirty = function() {
 		_dirty = false;
+		return self;
 	};
 	
 	static IsNumeric = function() {
@@ -73,7 +87,7 @@ function cm_SyncVariable(_name, _type) constructor {
 			name: name,
 			type: type,
 			value: value,
-			_dirty: _dirty // Necesario??
+			binding: binding
 		};
 		
 		struct_foreach(settings, function(settingVal, settingKey, _result) {

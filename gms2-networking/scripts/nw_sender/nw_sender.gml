@@ -57,6 +57,11 @@ function nw_Sender() constructor {
 		return AddSyncVar(syncVar);
 	};
 	
+	static AddSyncVarText = function(name) {
+		var syncVar = new cm_SyncVariable(name, SV_TEXT);
+		return AddSyncVar(syncVar);
+	};
+	
 	static AddSyncVarNumber = function(name, delta) {
 		var syncVar = new cm_SyncVariable(name, SV_INTEGER);
 		syncVar.SetDelta(delta);
@@ -87,7 +92,95 @@ function nw_Sender() constructor {
 		}, undefined);	
 	};
 	
+	static UpdateSyncVariableFromSender = function(syncVar) {
+		assert_is_true(
+			(syncVar.binding == SyncVarBinding.Regular || syncVar.binding == SyncVarBinding.TwoWay || nw_is_server()), 
+			"Wrong binding type");
+		
+		var this = self;
+			
+		if (syncVar.name == "x") {
+			if(syncVar.IsDifferent(this.instance.x)) {
+				syncVar.SetValue(round(this.instance.x));
+				this.instance.x = syncVar.value;
+				this.dirty = true;
+			}
+		}
+		else if (syncVar.name == "y") {
+			if(syncVar.IsDifferent(this.instance.y)) {
+				syncVar.SetValue(round(this.instance.y));
+				this.instance.y = syncVar.value;
+				this.dirty = true;
+			}
+		}
+		else if (syncVar.name == "image_angle") {
+			if(syncVar.IsDifferent(this.instance.image_angle)) {
+				syncVar.SetValue(round(this.instance.image_angle));
+				this.instance.image_angle = syncVar.value;
+				this.dirty = true;
+			}
+		}
+		else if(variable_instance_exists(this.instance, syncVar.name)) {
+			var currentValue = variable_instance_get(this.instance, syncVar.name);
+			if(syncVar.IsDifferent(currentValue)) {
+				if(syncVar.type == SV_INTEGER) {
+					syncVar.SetValue(round(currentValue));	
+					//	Save the rounded value
+					variable_instance_set(this.instance, syncVar.name, syncVar.value);
+				}
+				else {
+					syncVar.SetValue(currentValue);
+				}
+					
+				this.dirty = true;
+			}
+		}
+	};
+	
+	static UpdateTwoWaySyncVariableFromServer = function(syncVar) {		
+		if (nw_is_server()) {
+			return;
+		}
+		
+		assert_is_true(syncVar.binding == SyncVarBinding.TwoWay, "Wrong binding type");
+		
+		var this = self;
+			
+		if (syncVar.name == "x") {
+			if(syncVar.IsDifferent(this.instance.x)) {
+				syncVar.SetValue(round(this.instance.x));
+				this.instance.x = syncVar.value;
+			}
+		}
+		else if (syncVar.name == "y") {
+			if(syncVar.IsDifferent(this.instance.y)) {
+				syncVar.SetValue(round(this.instance.y));
+				this.instance.y = syncVar.value;
+			}
+		}
+		else if (syncVar.name == "image_angle") {
+			if(syncVar.IsDifferent(this.instance.image_angle)) {
+				syncVar.SetValue(round(this.instance.image_angle));
+				this.instance.image_angle = syncVar.value;
+			}
+		}
+		else if(variable_instance_exists(this.instance, syncVar.name)) {
+			var currentValue = variable_instance_get(this.instance, syncVar.name);
+			if(syncVar.IsDifferent(currentValue)) {
+				if(syncVar.type == SV_INTEGER) {
+					syncVar.SetValue(round(currentValue));	
+					//	Save the rounded value
+					variable_instance_set(this.instance, syncVar.name, syncVar.value);
+				}
+				else {
+					syncVar.SetValue(currentValue);
+				}
+			}
+		}
+	};
+	
 	static EndStep = function(sender) {
+		//	TODO	Ver si eliminar.
 	};
 	
 	static staticToPackage = function(_self, variablesToSend) {
@@ -101,6 +194,7 @@ function nw_Sender() constructor {
 				reducedSyncVar.smooth = data.smooth;
 			}
 			else {
+				//	TODO	Esto no debería enviarse. Se debería interpretar "del otro lado".
 				reducedSyncVar.smooth = true;	
 			}
 		
