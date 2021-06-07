@@ -53,3 +53,19 @@ function nw_is_client() {
 function nw_is_online() {
 	return !global.nwNetworkManager.offline;
 }
+
+function nw_send(_socket, _name, _data) {
+	assert_is_string(_name);
+	global.nwNetworkManager.nwSend(_socket, _name, _data);
+}
+
+function nw_subscribe_receive(_name, _fn, _args) {
+	assert_is_string(_name);
+	var sid = global.nwNetworkManager.evSubscribe("recv-"+_name, _fn, _args);
+	return sid;
+}
+
+function nw_subscription_destroy(_subscription) {
+	assert_is_number(_subscription);
+	global.nwNetworkManager.unsubscribe(_subscription);
+}

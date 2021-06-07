@@ -9,14 +9,10 @@ function ds_list_toArray(list) {
 }
 
 function ds_list_removeAll(list, fn, args) {
-	var toRemove = ds_list_create();
-	
 	while(ds_list_findIndex(list, fn, args) >= 0) {
 		var ix = ds_list_findIndex(list, fn, args);
 		ds_list_delete(list, ix);
 	}
-	
-	ds_list_destroy(toRemove);
 }
 
 function ds_list_findIndex(list, fn, args) {

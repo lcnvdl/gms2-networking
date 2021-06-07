@@ -91,6 +91,19 @@ function nwRegisterObjectAsSyncSender(instance, _uuid) {
 	return newId;
 }
 
+function nwSend(_socket, _name, _data) {
+	assert_is_not_undefined(_socket);
+	assert_is_not_undefined(_data);
+	assert_is_string(_name);
+	
+	var _package = {
+		name: _name,
+		data: _data
+	};
+	
+	engine.send(sendBuffer, _socket, NwMessageType.syncPackage, _package);
+}
+
 #endregion	//	Public functions
 
 //	Internal functions
@@ -226,6 +239,7 @@ function _manageSocketClientEvent(asyncLoad) {
 
 function _nwClientProcessPackage(pck) {
 	if (pck.id == NwMessageType.syncPackage) {
+		self.evCallWithArgs("recv-" + pck.data.name, { socket: socket, data: pck });
 	}
 	else if (pck.id == NwMessageType.syncObjectCreate) {
 	}
@@ -251,7 +265,10 @@ function _nwDestroyAllInstancesOfClient(socket) {
 function _onReceiveServerPacket(buffer, socket) {
 	var pck = engine.receive(buffer);
 	
-	if (pck.id == NwMessageType.syncObjectCreate) {
+	if (pck.id == NwMessageType.syncPackage) {
+		self.evCallWithArgs("recv-" + pck.data.name, { socket: socket, data: pck });
+	}
+	else if (pck.id == NwMessageType.syncObjectCreate) {
 	}
 	else if (pck.id == NwMessageType.syncClientLocation) {
 		var data = _clientsMgr.GetInfo(socket);

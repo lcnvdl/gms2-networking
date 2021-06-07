@@ -54,8 +54,8 @@
     "children": [],
   },
   "RoomOrderNodes": [
-    {"roomId":{"name":"nw_example_2_room","path":"rooms/nw_example_2_room/nw_example_2_room.yy",},},
     {"roomId":{"name":"nw_example_1_room","path":"rooms/nw_example_1_room/nw_example_1_room.yy",},},
+    {"roomId":{"name":"nw_example_2_room","path":"rooms/nw_example_2_room/nw_example_2_room.yy",},},
     {"roomId":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
   ],
   "Folders": [

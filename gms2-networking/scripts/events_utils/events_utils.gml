@@ -28,13 +28,19 @@ function evListener(instance){
 						}
 					}
 				}
-			}, {evName:evName, _args:_args});
+			}, { evName:evName, _args:_args });
+			
+			//	TODO	Optimize
+			ds_list_removeAll(subscriptions, function(value, idx, __args) {
+				return value.ttl == 0;
+			}, undefined);
 		}
 
 		function evCall(evName) {
-			ds_list_foreach(subscriptions, function(s, i, _evName) {
+			for(var i = 0; i < ds_list_size(subscriptions); i++) {
+				var s = ds_list_find_value(subscriptions, i);
 				if (s.ttl != 0) {
-					if (s.event == _evName) {
+					if (s.event == evName) {
 						s.action(s.args);
 				
 						if (s.ttl > 0) {
@@ -42,7 +48,26 @@ function evListener(instance){
 						}
 					}
 				}
-			}, evName);
+			}
+			
+			//	TODO	Optimize
+			ds_list_removeAll(subscriptions, function(value, idx, __args) {
+				return value.ttl == 0;
+			}, undefined);
+		}
+		
+		function evSubscribeOnce(evName, action, args) {
+			var subscription = {
+				id: lastSubscriptionId++,
+				event: evName,
+				action: action,
+				args: args,
+				ttl: 1
+			};
+	
+			ds_list_add(subscriptions, subscription);
+	
+			return lastSubscriptionId;
 		}
 
 		function evSubscribe(evName, action, args) {
