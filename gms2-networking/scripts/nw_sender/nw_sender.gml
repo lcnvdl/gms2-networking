@@ -145,6 +145,8 @@ function nw_Sender() constructor {
 		assert_is_true(syncVar.binding == SyncVarBinding.TwoWay, "Wrong binding type");
 		
 		var this = self;
+		
+		syncVar.SetSignal(true);
 			
 		if (syncVar.name == "x") {
 			if(syncVar.IsDifferent(this.instance.x)) {

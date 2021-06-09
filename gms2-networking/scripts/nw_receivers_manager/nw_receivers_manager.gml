@@ -7,7 +7,7 @@ function nw_ReceiversManager() constructor {
 	
 	static Dispose = function() {
 		ds_map_foreach(receivers, function(receiver) {
-			ds_list_destroy(receiver.syncVariables);
+			receiver.Dispose();
 		}, undefined);
 		ds_map_destroy(receivers);
 	};
@@ -23,7 +23,7 @@ function nw_ReceiversManager() constructor {
 				_UpdateReceiver(receiver);
 			}
 			else {
-				Delete(receiverId);
+				DestroyAndDelete(receiverId);
 			}
 		}, undefined);
 	};
@@ -54,17 +54,12 @@ function nw_ReceiversManager() constructor {
 			var currentLayer = (existingBrother == noone) ? global.nwNetworkManager.layer : existingBrother.layer;
 			
 			var instance = instance_create_layer(-100, -100, currentLayer, objectIdx);
-	
-			var recvInfo = {
-				uuid: info.uuid, 
-				instance: instance,
-				object: info.object,
-				dirty: true,
-				syncVariables: ds_list_create()
-			};
+			
+			var newReceiver = new nw_Receiver();
+			newReceiver.Deserialize(info, instance);
 			
 			if(global.nwNetworkManager.serverMode) {
-				recvInfo.client = socketOwnerOfSender;
+				newReceiver.SetClient(socketOwnerOfSender);
 			}
 			
 			//	TODO	Validate values using ServerController
@@ -74,12 +69,13 @@ function nw_ReceiversManager() constructor {
 				var _instance = _args.instance;
 				var _value = _info.variables[$ varName];
 				
-				ds_list_add(_recvInfo.syncVariables, { 
+				_recvInfo.AddSyncVar({ 
 					name: varName,
 					type: varVal.type,
 					smooth: varVal.smooth,
 					value: _value, 
-					dirty: false });
+					dirty: false
+				});
 				
 				if (is_undefined(_value)) {
 					show_debug_message(varName + " IGNORED (undefined)");
@@ -88,7 +84,7 @@ function nw_ReceiversManager() constructor {
 					show_debug_message(varName + " set to " + string(_value));
 					variable_instance_set(_instance, varName, _value);
 				}
-			}, { recvInfo:recvInfo, info:info, instance: instance });
+			}, { recvInfo:newReceiver, info:info, instance: instance });
 			
 			instance.nwRecv = true;			//	Remove?
 			instance.nwUuid = info.uuid;	//	Remove?
@@ -101,14 +97,9 @@ function nw_ReceiversManager() constructor {
 			
 			//	TODO	Assign syncVariables
 			struct_foreach(info.variables, function(varVal, varName, _existing) {
-				var _syncVariables = _existing.syncVariables;
-				var ix = ds_list_findIndex(_syncVariables, function(_syncVar, __i, _varName) {
-					return _syncVar.name == _varName;
-				}, varName);
+				var syncVar = _existing.GetSyncVar(varName);
 				
-				assert_not_equals(ix, -1, "The variable " + varName + " is missing.");
-				
-				var syncVar = ds_list_find_value(_syncVariables, ix);
+				assert_is_not_undefined(syncVar, "The variable " + varName + " is missing.");
 				
 				//	Server validators
 				if (nw_is_server() && instance_exists(_existing.instance)) {
@@ -124,28 +115,15 @@ function nw_ReceiversManager() constructor {
 				syncVar.dirty = true;
 				
 				show_debug_message(varName + "=" + string(varVal));
-				
-				// variable_instance_set(_existing.instance, varName, varVal);
 			}, existing );
 		}
 	};
 	
-	static Delete = function(_uuid) {
-		var receiver = Get(receivers, _uuid);
-		if(!is_undefined(receiver)) {
-			ds_list_destroy(receiver.syncVariables);
-			ds_map_delete(receivers, _uuid);
-		}
-	};
-	
 	static DestroyAndDelete = function(_uuid) {
-		var receiver = ds_map_find_value(receivers, _uuid);
+		var receiver = Get(_uuid);
 		if(!is_undefined(receiver)) {
-			if (instance_exists(receiver.instance)) {
-				instance_destroy(receiver.instance);	
-			}
-			
-			Delete(_uuid);
+			receiver.Dispose();			
+			ds_map_delete(receivers, _uuid);
 		}	
 	};
 }

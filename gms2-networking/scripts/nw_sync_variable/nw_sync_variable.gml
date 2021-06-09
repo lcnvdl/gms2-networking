@@ -10,9 +10,22 @@ function cm_SyncVariable(_name, _type) constructor {
 	_dirty = false;
 	settings = {};
 	
+	//	Two-way binding. If signal is false, the sender can send the value.
+	static IsSignaled = function() {
+		return variable_struct_exists(settings, "signal") &&
+			settings[$ "signal"] == true;
+	};
+	
+	static SetSignal = function(v) {
+		settings[$ "signal"] = v;
+	};
+	
 	static SetValue = function(v) {
 		value = v;
-		_dirty = true;
+		
+		if (binding != SyncVarBinding.TwoWay || !IsSignaled()) {
+			_dirty = true;
+		}
 	};
 	
 	//	TODO	Unused. It needs to be called.

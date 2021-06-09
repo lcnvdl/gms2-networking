@@ -54,9 +54,24 @@ function nw_is_online() {
 	return !global.nwNetworkManager.offline;
 }
 
-function nw_send(_socket, _name, _data) {
+function nw_get_socket() {
+	return global.nwNetworkManager.serverSocket;
+}
+
+function nw_send(_name, _data) {
+	nw_send_to(nw_get_socket(), _name, _data);
+}
+
+function nw_send_to(_socket, _name, _data) {
+	assert_is_not_undefined(_socket);
 	assert_is_string(_name);
 	global.nwNetworkManager.nwSend(_socket, _name, _data);
+}
+
+function nw_broadcast(_name, _data) {
+	assert_is_string(_name);
+	assert_is_true(nw_is_server());
+	global.nwNetworkManager.nwSendBroadcast(_name, _data);
 }
 
 function nw_subscribe_receive(_name, _fn, _args) {

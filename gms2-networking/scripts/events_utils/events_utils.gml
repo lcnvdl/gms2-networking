@@ -4,10 +4,15 @@ function evListener(instance){
 		subscriptions = ds_list_create();
 
 		cleanUpSubscriptions = function() {
-			ds_list_destroy(subscriptions);	
+			ds_list_destroy(subscriptions);
+			subscriptions = undefined;
 		}
 
 		function unsubscribe(subscriptionId) {
+			if(is_undefined(subscriptions)) {
+				return;	
+			}
+			
 			var pos = ds_list_findIndex(subscriptions, function(m, __i, _subscriptionId){
 				return m.id == _subscriptionId;
 			}, subscriptionId);
@@ -58,7 +63,7 @@ function evListener(instance){
 		
 		function evSubscribeOnce(evName, action, args) {
 			var subscription = {
-				id: lastSubscriptionId++,
+				id: ++lastSubscriptionId,
 				event: evName,
 				action: action,
 				args: args,
@@ -72,7 +77,7 @@ function evListener(instance){
 
 		function evSubscribe(evName, action, args) {
 			var subscription = {
-				id: lastSubscriptionId++,
+				id: ++lastSubscriptionId,
 				event: evName,
 				action: action,
 				args: args,
