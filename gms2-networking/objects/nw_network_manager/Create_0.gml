@@ -211,10 +211,12 @@ function _manageSocketServerEvent(asyncLoad) {
 	switch(eventType) {
 		case network_type_connect: {
 			_addNewClient(eventSocket);
+			self.evCallWithArgs("connect", { socket: eventSocket });
 		}
 		break
 	
 		case network_type_disconnect: {
+			self.evCallWithArgs("disconnect", { socket: eventSocket });
 			_nwDestroyAllInstancesOfClient(eventSocket);
 			_clientsMgr.Remove(eventSocket);
 		}
@@ -242,6 +244,9 @@ function _manageSocketClientEvent(asyncLoad) {
 		}
 		break;
 		case network_type_disconnect: {
+			self.evCallWithArgs("disconnect", {});
+			
+			//	TODO	Remove this
 			show_message("Servidor desconectado!");
 			game_end();
 		}
