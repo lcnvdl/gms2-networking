@@ -13,17 +13,19 @@ Almost-magic Networking System for Game Maker Studio +2.3.
 
 [Diagram code](./docs/Diagrams/class_diagram.txt)
 
-## Code convention
+## Contributing
+
+### Guidelines
+Please follow this guidelines before contribute:
+[Contributing](./docs/CONTRIBUTING.md)
+
+### Code convention
 All the code must respect the rules in the convention file:
 [Code convention](docs/code_convention.md)
 
 > It is required. Otherwise, all changes will be rejected.
 
-## Contributing
-Please follow this guidelines before contribute:
-[Contributing](./docs/CONTRIBUTING.md)
-
-## Troubleshooting
+### Troubleshooting
 Please follow this guidelines when reporting bugs and feature requests:
 
 1. Use [GitHub Issues](https://github.com/lcnvdl/gms2-networking/issues) board to report bugs and feature requests (not our email address)
