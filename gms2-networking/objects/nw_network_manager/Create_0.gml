@@ -48,7 +48,7 @@ function startServer() {
 		serverSocket = engine.serve(networkSettings.port);
 		serverMode = true;
 		offline = false;
-		evCall("server-connect");
+		evCall(EV_SERVER_CONNECT);
 	}
 	catch(err) {
 		show_error(err, false);
@@ -64,7 +64,7 @@ function startClient() {
 		serverSocket = engine.connect(networkSettings.ip, networkSettings.port);
 		serverMode = false;
 		offline = false;
-		evCall("client-connect");
+		evCall(EV_CLIENT_CONNECT);
 	}
 	catch(err) {
 		show_error(err, false);
@@ -211,12 +211,12 @@ function _manageSocketServerEvent(asyncLoad) {
 	switch(eventType) {
 		case network_type_connect: {
 			_addNewClient(eventSocket);
-			self.evCallWithArgs("connect", { socket: eventSocket });
+			self.evCallWithArgs(EV_SOCKET_CONNECT, { socket: eventSocket });
 		}
 		break
 	
 		case network_type_disconnect: {
-			self.evCallWithArgs("disconnect", { socket: eventSocket });
+			self.evCallWithArgs(EV_SOCKET_DISCONNECT, { socket: eventSocket });
 			_nwDestroyAllInstancesOfClient(eventSocket);
 			_clientsMgr.Remove(eventSocket);
 		}
@@ -236,15 +236,14 @@ function _manageSocketClientEvent(asyncLoad) {
 	// var eventSocket = ds_map_find_value(asyncLoad, "socket");
 
 	switch(eventType) {
-		case network_type_data:
-		{
+		case network_type_data:	{
 			var buffer = ds_map_find_value(asyncLoad, "buffer");
 			var pck = engine.receive(buffer);
 			_nwClientProcessPackage(pck);
 		}
 		break;
 		case network_type_disconnect: {
-			self.evCallWithArgs("disconnect", {});
+			self.evCallWithArgs(EV_SOCKET_DISCONNECT, {});
 			
 			//	TODO	Remove this
 			show_message("Servidor desconectado!");
@@ -306,7 +305,7 @@ function _onReceiveServerPacket(buffer, socket) {
 		}
 	}
 	
-	self.evCallWithArgs("server-receive", pck);
+	self.evCallWithArgs(EV_SERVER_RECEIVE_PCK, pck);
 }
 
 #endregion	//	Private functions

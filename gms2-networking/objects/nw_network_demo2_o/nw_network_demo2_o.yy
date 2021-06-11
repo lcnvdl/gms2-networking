@@ -26,7 +26,7 @@
   ],
   "properties": [],
   "overriddenProperties": [
-    {"propertyId":{"name":"waiting_mode_description","path":"objects/nw_network_base_demo/nw_network_base_demo.yy",},"objectId":{"name":"nw_network_base_demo","path":"objects/nw_network_base_demo/nw_network_base_demo.yy",},"value":"Example 2\\nWaiting for connection. C = Server, B = Client.","resourceVersion":"1.0","name":"","tags":[],"resourceType":"GMOverriddenProperty",},
+    {"propertyId":{"name":"waiting_mode_description","path":"objects/nw_network_base_demo/nw_network_base_demo.yy",},"objectId":{"name":"nw_network_base_demo","path":"objects/nw_network_base_demo/nw_network_base_demo.yy",},"value":"Example 2 - Sync var types\\nWaiting for connection. C = Server, B = Client.","resourceVersion":"1.0","name":"","tags":[],"resourceType":"GMOverriddenProperty",},
   ],
   "parent": {
     "name": "Example_2",

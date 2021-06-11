@@ -75,12 +75,12 @@ function nw_broadcast(_name, _data) {
 }
 
 function nw_subscribe_connect(_fn, _args) {
-	var sid = global.nwNetworkManager.evSubscribe("connect", _fn, _args);
+	var sid = global.nwNetworkManager.evSubscribe(EV_SOCKET_CONNECT, _fn, _args);
 	return sid;
 }
 
 function nw_subscribe_disconnect(_fn, _args) {
-	var sid = global.nwNetworkManager.evSubscribe("disconnect", _fn, _args);
+	var sid = global.nwNetworkManager.evSubscribe(EV_SOCKET_DISCONNECT, _fn, _args);
 	return sid;
 }
 
