@@ -44,6 +44,7 @@ function nw_SendersManager() constructor {
 		var newUuid;
 		
 		if(is_undefined(_uuid)) {
+			randomize();
 			newUuid = getUuid();	
 		}
 		else {

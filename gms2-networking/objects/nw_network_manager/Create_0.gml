@@ -299,9 +299,11 @@ function _onReceiveServerPacket(buffer, socket) {
 	else if (pck.id == NwMessageType.syncObjectUpdate)  {
 		if(!_sendersMgr.Exists(pck.data.uuid)) {
 			_receiversMgr.ReceiveDataFromSender(pck.data, socket);
+			//	TODO	Validate data
+			nwBroadcast(pck.id, pck.data);
 		}
 		else {
-			//	TODO	Update senders	
+			//	TODO	Update senders
 		}
 	}
 	

@@ -144,9 +144,14 @@ function nw_Sender() constructor {
 		
 		assert_is_true(syncVar.binding == SyncVarBinding.TwoWay, "Wrong binding type");
 		
+		//	If the value is trying to be send from the client (sender)
+		if (syncVar.CanSendValue()) {
+			return;	
+		}
+		
 		var this = self;
 		
-		syncVar.SetSignal(true);
+		//	TODO	Smooth the values
 			
 		if (syncVar.name == "x") {
 			if(syncVar.IsDifferent(this.instance.x)) {

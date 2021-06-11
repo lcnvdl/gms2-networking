@@ -10,22 +10,38 @@ function cm_SyncVariable(_name, _type) constructor {
 	_dirty = false;
 	settings = {};
 	
-	//	Two-way binding. If signal is false, the sender can send the value.
-	static IsSignaled = function() {
-		return variable_struct_exists(settings, "signal") &&
-			settings[$ "signal"] == true;
-	};
-	
-	static SetSignal = function(v) {
-		settings[$ "signal"] = v;
-	};
-	
 	static SetValue = function(v) {
 		value = v;
+		_dirty = true;
+	};
+	
+	static SetValueFromServer = function(v) {
+		assert_equals(binding, SyncVarBinding.TwoWay);
 		
-		if (binding != SyncVarBinding.TwoWay || !IsSignaled()) {
-			_dirty = true;
+		value = v;
+	};
+	
+	static SendToServer = function(v) {
+		assert_equals(binding, SyncVarBinding.TwoWay);
+		
+		settings[$ "tw_dirty"] = true;
+		return self;
+	};
+	
+	static CanSendValue = function() {
+		if (binding == SyncVarBinding.TwoWay) {
+			if (!settings[$ "tw_dirty"]) {
+				return false;	
+			}
 		}
+		
+		if (binding == SyncVarBinding.Server) {
+			if (nw_is_client()) {
+				return false;
+			}
+		}
+		
+		return _dirty;	
 	};
 	
 	//	TODO	Unused. It needs to be called.
@@ -53,6 +69,11 @@ function cm_SyncVariable(_name, _type) constructor {
 	
 	static SetBinding = function(_binding) {
 		binding = _binding;
+		
+		if (binding == SyncVarBinding.TwoWay) {
+			settings[$ "tw_dirty"] = false;
+		}
+		
 		return self;
 	};
 	
@@ -67,6 +88,11 @@ function cm_SyncVariable(_name, _type) constructor {
 
 	static ClearDirty = function() {
 		_dirty = false;
+		
+		if (binding == SyncVarBinding.TwoWay) {
+			settings[$ "tw_dirty"] = false;
+		}
+		
 		return self;
 	};
 	
@@ -95,12 +121,19 @@ function cm_SyncVariable(_name, _type) constructor {
 		return instanceValue != value;
 	};
 	
+	static Deserialize = function(data) {
+		struct_foreach(data, function(settingVal, settingKey, _obj) {
+			_obj[$ settingKey] = settingVal;
+		}, self);
+		
+		return self;
+	};
+	
 	static Serialize = function() {
 		var result = {
 			name: name,
 			type: type,
-			value: value,
-			binding: binding
+			value: value
 		};
 		
 		struct_foreach(settings, function(settingVal, settingKey, _result) {

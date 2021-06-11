@@ -1,12 +1,12 @@
 with(global.nwNetworkManager) {
-	evSubscribe("client-connect", function() {
+	evSubscribe(EV_CLIENT_CONNECT, function() {
 		var inst = instance_create_layer(
 			irandom_range(32, room_width-32),
 			irandom_range(32, room_height-32),
 			"Instances",
-			nw_client_sender_controlled_by_server_o
+			nw_player_ship
 		);
 		
-		inst.isPlayer = true;
+		inst.startAsPlayer();
 	}, undefined);
 }

@@ -1,5 +1,5 @@
 //	Server socket creation
-#macro EV_SERVER_CONNECT "client-connect"
+#macro EV_SERVER_CONNECT "server-connect"
 //	Client socket creation
 #macro EV_CLIENT_CONNECT "client-connect"
 //	New client accepted (server)

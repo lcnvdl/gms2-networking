@@ -32,9 +32,31 @@ function nw_Receiver() constructor {
 		return variable;
 	};
 	
-	static Deserialize = function(info, instance) {
+	static AddSyncVarInt = function(name, delta) {
+		var syncVar = new cm_SyncVariable(name, SV_INTEGER);
+		syncVar.SetDelta(delta);
+		return AddSyncVar(syncVar);
+	};
+	
+	static AddSyncVarText = function(name) {
+		var syncVar = new cm_SyncVariable(name, SV_TEXT);
+		return AddSyncVar(syncVar);
+	};
+	
+	static AddSyncVarNumber = function(name, delta) {
+		var syncVar = new cm_SyncVariable(name, SV_INTEGER);
+		syncVar.SetDelta(delta);
+		return AddSyncVar(syncVar);
+	};
+	
+	static AddSyncVarBoolean = function(name) {
+		var syncVar = new cm_SyncVariable(name, SV_BOOLEAN);
+		return AddSyncVar(syncVar);
+	};
+	
+	static Deserialize = function(info, _instance) {
 		uuid = info.uuid;
-		instance = info.instance;
+		instance = _instance;
 		object = info.object;
 		dirty = true;
 	};

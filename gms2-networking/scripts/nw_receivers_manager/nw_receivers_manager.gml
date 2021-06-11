@@ -29,8 +29,13 @@ function nw_ReceiversManager() constructor {
 	};
 	
 	static _UpdateReceiver = function(receiver) {
-		ds_list_foreach(receiver.syncVariables, function(v, i, _info) {
-			_nw_smooth_update_entity(v, _info.instance);
+		ds_list_foreach(receiver.syncVariables, function(syncVar, __i, _receiver) {
+			if (syncVar.binding != SyncVarBinding.Server) {
+				_nw_smooth_update_entity(syncVar, _receiver.instance);
+			}
+			else {
+				//	TODO	Send value	
+			}
 		}, receiver);
 	};
 	
@@ -69,13 +74,10 @@ function nw_ReceiversManager() constructor {
 				var _instance = _args.instance;
 				var _value = _info.variables[$ varName];
 				
-				_recvInfo.AddSyncVar({ 
-					name: varName,
-					type: varVal.type,
+				_recvInfo.AddSyncVar(new cm_SyncVariable(varName, varVal.type).Deserialize({ 
 					smooth: varVal.smooth,
-					value: _value, 
-					dirty: false
-				});
+					value: _value
+				}));
 				
 				if (is_undefined(_value)) {
 					show_debug_message(varName + " IGNORED (undefined)");
@@ -86,11 +88,15 @@ function nw_ReceiversManager() constructor {
 				}
 			}, { recvInfo:newReceiver, info:info, instance: instance });
 			
-			instance.nwRecv = true;			//	Remove?
-			instance.nwUuid = info.uuid;	//	Remove?
-			instance.nwInfo = recvInfo;		//	Remove?
+			instance.nwRecv = true;
+			instance.nwUuid = info.uuid;
+			instance.nwInfo = newReceiver;
 			
-			ds_map_add(receivers, info.uuid, recvInfo);
+			if (variable_instance_exists(instance, "nwOnCreateReceiver")) {
+				instance.nwOnCreateReceiver(newReceiver);	
+			}
+			
+			ds_map_add(receivers, info.uuid, newReceiver);
 		}
 		else {
 			existing.dirty = true;
@@ -111,8 +117,7 @@ function nw_ReceiversManager() constructor {
 				}
 				
 				//	New sync var value
-				syncVar.value = varVal;
-				syncVar.dirty = true;
+				syncVar.SetValue(varVal);
 				
 				show_debug_message(varName + "=" + string(varVal));
 			}, existing );
