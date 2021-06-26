@@ -1,0 +1,62 @@
+@startuml
+class NetworkManager
+
+package "Engine" {
+  abstract class BaseEngine
+  class NetworkGMLEngine
+  class NetworkHTTP2Engine
+}
+
+package "Server Side" {
+  class ClientsManager
+  class ServerController
+  class ServerSideObjectValidator
+}
+
+package "Auto-Communication" {
+  class SendersManager
+  class ReceiversManager
+  class Receiver
+  class Sender
+}
+
+package "Manual-Communication" {
+  class Subscription
+  class Events
+  class ManualCommunication
+}
+
+package "Network Actor" {
+  abstract class NetworkActor
+  class SyncVariable
+  class RemoteProcedure
+}
+
+note right of ManualCommunication: Send and receive custom\nstructs (advanced users).
+note top of BaseEngine: You can implement different engines.
+note bottom of ServerSideObjectValidator: Validates each sync\nvariable.
+note bottom of SyncVariable: Auto-synchronization.
+note bottom of RemoteProcedure: Remote Procedure\nCalls.
+
+NetworkManager <.. SendersManager
+NetworkManager <.. ReceiversManager
+NetworkManager <.. ClientsManager
+NetworkManager <.. BaseEngine
+NetworkManager <.. ServerController
+
+BaseEngine <|-- NetworkGMLEngine : inherits
+BaseEngine <|-- NetworkHTTP2Engine : inherits
+NetworkActor <|-- Sender : inherits
+NetworkActor <|-- Receiver : inherits
+
+SendersManager "1" *-- "*" Sender : contains
+
+ReceiversManager "1" *-- "*" Receiver : contains
+
+NetworkActor "1" *-- "*" SyncVariable : contains
+NetworkActor "1" *-- "*" RemoteProcedure : contains
+
+ServerController "1" *-- "*" ServerSideObjectValidator : contains
+
+"Manual-Communication" ..> NetworkManager
+@enduml
