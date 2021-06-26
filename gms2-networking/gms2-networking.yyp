@@ -1,5 +1,6 @@
 {
   "resources": [
+    {"id":{"name":"nw_rpc_fn","path":"scripts/nw_rpc_fn/nw_rpc_fn.yy",},"order":0,},
     {"id":{"name":"nw_receivers_manager","path":"scripts/nw_receivers_manager/nw_receivers_manager.yy",},"order":1,},
     {"id":{"name":"events_utils","path":"scripts/events_utils/events_utils.yy",},"order":0,},
     {"id":{"name":"array_extension","path":"scripts/array_extension/array_extension.yy",},"order":0,},
@@ -119,6 +120,7 @@
     {"folderPath":"folders/Scripts/Gms2_Networking/Engine/Implementations.yy","order":3,"resourceVersion":"1.0","name":"Implementations","tags":[],"resourceType":"GMFolder",},
     {"folderPath":"folders/Scripts/Gms2_Networking/AutoMagic_System/Base.yy","order":2,"resourceVersion":"1.0","name":"Base","tags":[],"resourceType":"GMFolder",},
     {"folderPath":"folders/Objects/Gms2_Networking_Examples/Example_4.yy","order":7,"resourceVersion":"1.0","name":"Example_4","tags":[],"resourceType":"GMFolder",},
+    {"folderPath":"folders/Scripts/Gms2_Networking/AutoMagic_System/Rpc.yy","order":3,"resourceVersion":"1.0","name":"Rpc","tags":[],"resourceType":"GMFolder",},
   ],
   "AudioGroups": [
     {"targets":-1,"resourceVersion":"1.3","name":"audiogroup_default","resourceType":"GMAudioGroup",},

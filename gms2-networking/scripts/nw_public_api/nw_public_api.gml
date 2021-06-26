@@ -50,6 +50,15 @@ function nw_get_sender(_uuid) {
 	return global.nwNetworkManager.getSendersManager().Get(_uuid);
 }
 
+function nw_instance_register_function(instance, name, fnCall) {
+	var _opts = argument_count > 3 ? argument[3] : undefined;
+	global.nwNetworkManager.registerRpcFunction(instance, name, fnCall, _opts);
+}
+
+function nw_call_function(instance, fnName, fnArgs) {
+	global.nwNetworkManager.callRpcFunction(instance, fnName, fnArgs);	
+}
+
 function nw_set_network_engine_factory(_function) {
 	global.nwNetworkManagerFactory = _function;	
 }

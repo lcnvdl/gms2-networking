@@ -116,6 +116,107 @@ function nwSend(_socket, _name, _data) {
 	engine.send(sendBuffer, _socket, NwMessageType.syncPackage, _package);
 }
 
+function callRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall) {
+	var existing = undefined;
+	var _uuid = instanceUuid;
+	with(all) {
+		if(variable_instance_exists(id, "nwUuid")) {
+			if(nwUuid == _uuid) {
+				existing = id;	
+			}
+		}
+	}
+	
+	if (!is_undefined(existing)) {
+		var rpc = instance.rpcFunctions[$ fnName];
+		var isSender = _sendersMgr.Exists(_uuid);
+		var isReceiver = !isSender;
+		
+		if (rpc.allowance == RpcFunctionCallerAllowance.Everyone ||
+			(rpc.allowance == RpcFunctionCallerAllowance.Client && nw_is_client()) ||
+			(rpc.allowance == RpcFunctionCallerAllowance.Server && nw_is_server()) ||
+			(rpc.allowance == RpcFunctionCallerAllowance.Owner && id == existing) ||
+			(rpc.allowance == RpcFunctionCallerAllowance.Receiver && isReceiver) ||
+			(rpc.allowance == RpcFunctionCallerAllowance.Sender && isSender)
+		) {
+			for(var i = 0; i < array_length(rpc.executors); i++) {
+				var executor = rpc.executors[i];
+				var package = {
+					id: instanceUuid, 
+					name: fnName, 
+					args: fnArgs,
+					from: -1,
+					to: executor
+				};
+				
+				if (executor == RpcFunctionExecutor.Owner) {
+					if (id == existing) {
+						rpc.Call(fnArgs);
+					}
+				}
+				else if (executor == RpcFunctionExecutor.Client) {
+					if (nw_is_client()) {
+						rpc.Call(fnArgs);
+						if (isFirstCall) {
+							package.from = RpcFunctionExecutor.Client;
+							engine.send(sendBuffer, _socket, NwMessageType.rpcCall, package);
+						}
+					}
+					else {
+						package.from = RpcFunctionExecutor.Server;
+						nwBroadcast(NwMessageType.rpcCall, package);
+					}
+				}
+				else if (executor == RpcFunctionExecutor.Server) {
+					if (nw_is_server()) {
+						rpc.Call(fnArgs);
+					}
+					else {
+						if (isFirstCall) {
+							package.from = RpcFunctionExecutor.Client;
+							engine.send(sendBuffer, _socket, NwMessageType.rpcCall, package);
+						}
+					}
+				}
+				else if (executor == RpcFunctionExecutor.Receiver) {
+					if (isReceiver){
+						rpc.Call(fnArgs);
+					}
+					else {	//	Sender
+						if (nw_is_client()) {
+							package.from = RpcFunctionExecutor.Sender;
+							engine.send(sendBuffer, _socket, NwMessageType.rpcCall, package);	
+						}
+						else if (nw_is_server()) {
+							package.from = RpcFunctionExecutor.Sender;
+							nwBroadcast(NwMessageType.rpcCall, package);	
+						}
+					}
+				}
+				else if (executor == RpcFunctionExecutor.Sender) {
+					if (isSender) {
+						rpc.Call(fnArgs);
+					}
+				}
+			}
+		}
+	}
+	
+	return -1;
+}
+
+function registerRpcFunction(instance, name, fnCall, _opts) {
+	if (!variable_instance_exists(instance, "nwUuid")) {
+		throw "The instance must be a sender or a receiver";	
+	}
+	
+	if (!variable_instance_exists(instance, "rpcFunctions")) {
+		instance.rpcFunctions = {};
+	}
+	
+	instance.rpcFunctions[$ name] = new nw_RpcFunction(name, fnCall, _opts);
+}
+
 #endregion	//	Public functions
 
 //	Internal functions
@@ -260,6 +361,8 @@ function _nwClientProcessPackage(pck) {
 	}
 	else if (pck.id == NwMessageType.syncObjectCreate) {
 	}
+	else if (pck.id == NwMessageType.rpcCall) {
+	}
 	else if (pck.id == NwMessageType.syncObjectDelete) {
 		_receiversMgr.DestroyAndDelete(pck.data.uuid);
 	}
@@ -286,6 +389,8 @@ function _onReceiveServerPacket(buffer, socket) {
 		self.evCallWithArgs("recv-" + pck.data.name, { socket: socket, data: pck });
 	}
 	else if (pck.id == NwMessageType.syncObjectCreate) {
+	}
+	else if (pck.id == NwMessageType.rpcCall) {
 	}
 	else if (pck.id == NwMessageType.syncClientLocation) {
 		var data = _clientsMgr.GetInfo(socket);

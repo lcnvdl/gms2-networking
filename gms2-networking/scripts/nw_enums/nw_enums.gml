@@ -3,7 +3,8 @@ enum NwMessageType {
 	syncObjectUpdate,
 	syncObjectDelete,
 	syncClientLocation,
-	syncPackage
+	syncPackage,
+	rpcCall
 }
 
 enum SmoothType {
@@ -19,4 +20,22 @@ enum SyncVarBinding {
 	Server,
 	//	TODO From sender to receivers, from server to sender
 	TwoWay
+}
+
+enum RpcFunctionCallerAllowance {
+	Client,
+	Server,
+	Sender,
+	Receiver,
+	Owner,
+	Everyone
+}
+
+enum RpcFunctionExecutor {
+	Client,
+	Server,
+	Sender,
+	Receiver,
+	Owner,
+	Everyone
 }
