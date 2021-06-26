@@ -14,7 +14,7 @@ Almost-magic Networking System for Game Maker Studio +2.3.
 * **Remote Procedure Calls (RPC) _//Work in progress//_.** _You can call instance functions, regardless of where they are on the network._
 
 ## Diagram
-![Class Diagram](https://www.plantuml.com/plantuml/png/TPBHIyCm4CRVyrSSVTB12kBRsCDmY2zEmS50sCirlMsnQLAIwqJK_ztCTfesx2sz-zsNtFTruHaTjxKMKgFty4JyRbsrGeDxSdrn_M7a1ft2GjEvHAOaD_Zmmw4NagIEKHaBpmubGzU_Gq_tPgyC3Qz-M3tsPT6WhC8eP6joGGdMggGCFWNq4akjoF3V1UToHo-jOMUrJXedbUVYZIHlKAiIsJhnBOInJC2s0RkBtZQ3Lzk2H0EgRZJLP1XAjTkHEvteb_5RSwLLHN1WRcx1MraHUoYrliuxsS8ospeeNtx23FeZUI2K1_31TDYQO-zxBiGm6vZd-TZvb4XZI9cnZoaHXvLsKyF5Fm_ph-aqoHPceCo1d68ln709o6uoc8IPR991rmgq3EAeJA3ZXHA-RyOJdVw8Y__e4HklCfww55uiiGYtjRN-0G00)
+![Class Diagram](https://www.lucianorasente.com/images/class_diagram.png)
 
 [Diagram code](./docs/Diagrams/class_diagram.txt)
 
