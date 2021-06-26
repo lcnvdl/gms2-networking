@@ -36,16 +36,6 @@ function nw_Sender() constructor {
 		return allValues;
 	};
 	
-	/*static GetAllValues = function() {
-		var allValues = {};
-		
-		ds_list_foreach(syncVariables, function(syncVariable, idx, _struct) {
-			_struct[$ syncVariable.name] = syncVariable.value;
-		}, allValues);
-		
-		return allValues;
-	};*/
-	
 	static AddSyncVar = function(variable) {
 		ds_list_add(syncVariables, variable);	
 		return variable;
@@ -120,13 +110,13 @@ function nw_Sender() constructor {
 				this.dirty = true;
 			}
 		}
-		else if(variable_instance_exists(this.instance, syncVar.name)) {
-			var currentValue = variable_instance_get(this.instance, syncVar.name);
+		else if(syncVar.ValueExists(this.instance)) {
+			var currentValue = syncVar.ReadValue(this.instance);
 			if(syncVar.IsDifferent(currentValue)) {
 				if(syncVar.type == SV_INTEGER) {
-					syncVar.SetValue(round(currentValue));	
+					syncVar.SetValue(round(currentValue));
 					//	Save the rounded value
-					variable_instance_set(this.instance, syncVar.name, syncVar.value);
+					syncVar.ApplyValue(this.instance);
 				}
 				else {
 					syncVar.SetValue(currentValue);
@@ -171,13 +161,13 @@ function nw_Sender() constructor {
 				this.instance.image_angle = syncVar.value;
 			}
 		}
-		else if(variable_instance_exists(this.instance, syncVar.name)) {
-			var currentValue = variable_instance_get(this.instance, syncVar.name);
+		else if(syncVar.ValueExists(this.instance)) {
+			var currentValue = syncVar.ReadValue(this.instance);
 			if(syncVar.IsDifferent(currentValue)) {
 				if(syncVar.type == SV_INTEGER) {
 					syncVar.SetValue(round(currentValue));	
 					//	Save the rounded value
-					variable_instance_set(this.instance, syncVar.name, syncVar.value);
+					syncVar.ApplyValue(this.instance);
 				}
 				else {
 					syncVar.SetValue(currentValue);

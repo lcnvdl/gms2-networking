@@ -10,9 +10,62 @@ function cm_SyncVariable(_name, _type) constructor {
 	_dirty = false;
 	settings = {};
 	
+	_isGlobal = undefined;
+	_realName = undefined;
+	
+	static _CalculateRealName = function() {
+		_isGlobal = string_pos("global.", name) == 1 || string_pos("global__", name);
+		_realName = _isGlobal ? string_replace(name, "global.", "") : name;
+		_realName = _isGlobal ? string_replace(_realName, "global__", "") : name;
+	};
+	
+	static GetName = function() {
+		return _realName;
+	};
+	
+	static IsGlobal = function() {
+		return _isGlobal;	
+	};
+	
 	static SetValue = function(v) {
 		value = v;
 		_dirty = true;
+	};
+	
+	static ValueExists = function(_instance) {
+		if(_isGlobal) {
+			return variable_global_exists(_realName);
+		}
+		else {
+			return variable_instance_exists(_instance, _realName);
+		}
+	};
+	
+	static ApplyCustomValue = function(_instance, _value) {
+		if(_isGlobal) {
+			variable_global_set(_realName, _value);
+		}
+		else {
+			variable_instance_set(_instance, _realName, _value);	
+		}
+	};
+	
+	static ApplyValue = function(_instance) {
+		if(_isGlobal) {
+			variable_global_set(_realName, value);
+		}
+		else {
+			variable_instance_set(_instance, _realName, value);	
+		}
+	};
+	
+	static ReadValue = function(_instance) {
+		if (_isGlobal) {
+			return variable_global_get(_realName);
+		}
+		else {
+			return variable_instance_get(_instance, _realName);
+		}
 	};
 	
 	static SetValueFromServer = function(v) {
@@ -126,6 +179,8 @@ function cm_SyncVariable(_name, _type) constructor {
 			_obj[$ settingKey] = settingVal;
 		}, self);
 		
+		_CalculateRealName();
+		
 		return self;
 	};
 	
@@ -148,4 +203,6 @@ function cm_SyncVariable(_name, _type) constructor {
 		json = string_replace_all(json, ",", ",\n");
 		return json;	
 	};
+	
+	_CalculateRealName();
 }

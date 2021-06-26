@@ -51,7 +51,7 @@ function nw_ReceiversManager() constructor {
 		
 		if(is_undefined(existing)) {
 			var objectIdx = asset_get_index(info.object);
-			if (objectIdx <= 0) {
+			if (objectIdx < 0) {
 				objectIdx = nw_empty_object;	
 			}
 			
@@ -74,17 +74,20 @@ function nw_ReceiversManager() constructor {
 				var _instance = _args.instance;
 				var _value = _info.variables[$ varName];
 				
-				_recvInfo.AddSyncVar(new cm_SyncVariable(varName, varVal.type).Deserialize({ 
+				var _syncVar = new cm_SyncVariable(varName, varVal.type);
+				
+				_recvInfo.AddSyncVar(_syncVar.Deserialize({ 
 					smooth: varVal.smooth,
 					value: _value
 				}));
 				
 				if (is_undefined(_value)) {
-					show_debug_message(varName + " IGNORED (undefined)");
+					show_debug_message(varName + " ignored creating a new receiver - empty initial value");
 				}
 				else {
 					show_debug_message(varName + " set to " + string(_value));
-					variable_instance_set(_instance, varName, _value);
+					
+					_syncVar.ApplyCustomValue(_instance, _value);
 				}
 			}, { recvInfo:newReceiver, info:info, instance: instance });
 			

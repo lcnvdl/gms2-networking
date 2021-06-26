@@ -6,4 +6,3 @@ Different sync var types.
 
 # Example 3
 Chat example using custom packages.
-

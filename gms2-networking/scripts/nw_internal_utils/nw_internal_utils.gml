@@ -22,8 +22,8 @@ function _nw_smooth_update_entity(syncVar, _instance) {
 				_instance.image_angle = damp_angle(_instance.image_angle, syncVar.value, 360*factor);
 			}
 		}
-		else if(variable_instance_exists(_instance, syncVar.name)) {
-			var currentValue = variable_instance_get(_instance, syncVar.name);
+		else if(syncVar.ValueExists(_instance)) {
+			var currentValue = syncVar.ReadValue(_instance);
 			if(currentValue != syncVar.value) {
 				var newValue = syncVar.value;
 				
@@ -38,12 +38,12 @@ function _nw_smooth_update_entity(syncVar, _instance) {
 						}
 					}
 				}
-					
-				variable_instance_set(_instance, syncVar.name, newValue);
+				
+				syncVar.ApplyCustomValue(_instance, newValue);
 			}
 		}
 	}
 	else {
-		show_debug_message(syncVar.name + " IS UNDEFINED!!");	
+		// show_debug_message(syncVar.name + " not setted in receiver (because of the undefined)");	
 	}
 }
