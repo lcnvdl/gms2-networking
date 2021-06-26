@@ -1,5 +1,5 @@
 # gms2-networking
-Almost-magic Networking System for Game Maker Studio +2.3.
+Auto-magic Networking System for Game Maker Studio +2.3.
 
 ## Features
 * **Auto-magic synchronization between objects**. _There is no longer a need to invent new protocols or mess up your code._
