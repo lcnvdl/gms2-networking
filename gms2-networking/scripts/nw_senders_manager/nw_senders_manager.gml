@@ -40,7 +40,7 @@ function nw_SendersManager() constructor {
 		}, sender);
 	};
 	
-	static Register = function(instance, _uuid) {
+	static Register = function(instance, _uuid, _opts) {
 		var newUuid;
 		
 		if(is_undefined(_uuid)) {
@@ -65,17 +65,19 @@ function nw_SendersManager() constructor {
 		var sender = new nw_Sender();
 		sender.Initialize(newUuid, instance);
 	
-		sender.AddSyncVarInt("x", 1);
-		sender.AddSyncVarInt("y", 1);
-		sender.AddSyncVarInt("depth", 0);
-		sender.AddSyncVarInt("image_angle", 5);
-		sender.AddSyncVarInt("image_single", 0);
-		sender.AddSyncVarInt("sprite_index", 0);
-		sender.AddSyncVarNumber("image_xscale", 0.01);
-		sender.AddSyncVarNumber("image_yscale", 0.01);
-		sender.AddSyncVarNumber("image_alpha", 0.01);
-		sender.AddSyncVarBoolean("visible");
-
+		if (is_undefined(_opts) || !_opts.emptySender) {
+			sender.AddSyncVarInt("x", 1);
+			sender.AddSyncVarInt("y", 1);
+			sender.AddSyncVarInt("depth", 0);
+			sender.AddSyncVarInt("image_angle", 5);
+			sender.AddSyncVarInt("image_single", 0);
+			sender.AddSyncVarInt("sprite_index", 0);
+			sender.AddSyncVarNumber("image_xscale", 0.01);
+			sender.AddSyncVarNumber("image_yscale", 0.01);
+			sender.AddSyncVarNumber("image_alpha", 0.01);
+			sender.AddSyncVarBoolean("visible");
+		}
+		
 		ds_map_set(senders, newUuid, sender);
 		
 		return newUuid;

@@ -84,8 +84,8 @@ function getServerController() {
 	return _serverController;	
 }
 
-function nwRegisterObjectAsSyncSender(instance, _uuid) {
-	var newId = _sendersMgr.Register(instance, _uuid);
+function nwRegisterObjectAsSyncSender(instance, _uuid, _opts) {
+	var newId = _sendersMgr.Register(instance, _uuid, _opts);
 	_syncNow();
 	
 	return newId;

@@ -1,0 +1,1 @@
+room_goto(nw_example_4_room);

@@ -15,7 +15,19 @@ function nw_configure(ip, port) {
 }
 
 function nw_add_sender(instance, _uuid) {
-	return global.nwNetworkManager.nwRegisterObjectAsSyncSender(instance, _uuid);
+	return global.nwNetworkManager.nwRegisterObjectAsSyncSender(instance, _uuid, argument_count > 2 ? argument[2] : undefined);
+}
+
+function nw_add_empty_sender(instance, _uuid) {
+	var _opts = { 
+		emptySender: true 
+	};
+	return global.nwNetworkManager.nwRegisterObjectAsSyncSender(instance, _uuid, _opts);
+}
+
+function nw_singleton_receiver(instance, _uuid) {
+	assert_is_string(_uuid);
+	instance.nwUuid = _uuid;
 }
 
 function nw_server_register_validator(objectIndex, fn) {

@@ -58,48 +58,28 @@ function nw_ReceiversManager() constructor {
 			var existingBrother = instance_find(objectIdx, 0);
 			var currentLayer = (existingBrother == noone) ? global.nwNetworkManager.layer : existingBrother.layer;
 			
-			var instance = instance_create_layer(-100, -100, currentLayer, objectIdx);
+			var instance = undefined;
 			
-			var newReceiver = new nw_Receiver();
-			newReceiver.Deserialize(info, instance);
-			
-			if(global.nwNetworkManager.serverMode) {
-				newReceiver.SetClient(socketOwnerOfSender);
+			if (existingBrother != noone && objectIdx != nw_empty_object) {
+				var withSameId = -1;
+				var targetUuid = info.uuid;
+				
+				with(objectIdx) {
+					if (variable_instance_exists(id, "nwUuid")) {
+						if(nwUuid == targetUuid) {
+							withSameId = id;	
+						}
+					}
+				}
+				
+				instance = withSameId;
 			}
 			
-			//	TODO	Validate values using ServerController
-			struct_foreach(info.syncVariables, function(varVal, varName, _args) {
-				var _recvInfo = _args.recvInfo;
-				var _info = _args.info;
-				var _instance = _args.instance;
-				var _value = _info.variables[$ varName];
-				
-				var _syncVar = new cm_SyncVariable(varName, varVal.type);
-				
-				_recvInfo.AddSyncVar(_syncVar.Deserialize({ 
-					smooth: varVal.smooth,
-					value: _value
-				}));
-				
-				if (is_undefined(_value)) {
-					show_debug_message(varName + " ignored creating a new receiver - empty initial value");
-				}
-				else {
-					show_debug_message(varName + " set to " + string(_value));
-					
-					_syncVar.ApplyCustomValue(_instance, _value);
-				}
-			}, { recvInfo:newReceiver, info:info, instance: instance });
-			
-			instance.nwRecv = true;
-			instance.nwUuid = info.uuid;
-			instance.nwInfo = newReceiver;
-			
-			if (variable_instance_exists(instance, "nwOnCreateReceiver")) {
-				instance.nwOnCreateReceiver(newReceiver);	
+			if(is_undefined(instance) || instance == -1) {
+				instance = instance_create_layer(-100, -100, currentLayer, objectIdx);
 			}
 			
-			ds_map_add(receivers, info.uuid, newReceiver);
+			CreateAndAttachReceiverToInstance(info, instance);
 		}
 		else {
 			existing.dirty = true;
@@ -123,8 +103,57 @@ function nw_ReceiversManager() constructor {
 				syncVar.SetValue(varVal);
 				
 				show_debug_message(varName + "=" + string(varVal));
-			}, existing );
+			}, existing);
 		}
+	};
+	
+	static CreateAndAttachReceiverToInstance = function(info, instance) {
+		if (variable_instance_exists(instance, "nwInfo")) {
+			return false;	
+		}
+		
+		var newReceiver = new nw_Receiver();
+		newReceiver.Deserialize(info, instance);
+			
+		if(global.nwNetworkManager.serverMode) {
+			newReceiver.SetClient(socketOwnerOfSender);
+		}
+			
+		//	TODO	Validate values using ServerController
+		struct_foreach(info.syncVariables, function(varVal, varName, _args) {
+			var _recvInfo = _args.recvInfo;
+			var _info = _args.info;
+			var _instance = _args.instance;
+			var _value = _info.variables[$ varName];
+				
+			var _syncVar = new cm_SyncVariable(varName, varVal.type);
+				
+			_recvInfo.AddSyncVar(_syncVar.Deserialize({ 
+				smooth: varVal.smooth,
+				value: _value
+			}));
+				
+			if (is_undefined(_value)) {
+				show_debug_message(varName + " ignored creating a new receiver - empty initial value");
+			}
+			else {
+				show_debug_message(varName + " set to " + string(_value));
+					
+				_syncVar.ApplyCustomValue(_instance, _value);
+			}
+		}, { recvInfo: newReceiver, info: info, instance: instance });
+			
+		instance.nwRecv = true;
+		instance.nwUuid = info.uuid;
+		instance.nwInfo = newReceiver;
+			
+		if (variable_instance_exists(instance, "nwOnCreateReceiver")) {
+			instance.nwOnCreateReceiver(newReceiver);	
+		}
+		
+		ds_map_add(receivers, info.uuid, newReceiver);
+		
+		return true;
 	};
 	
 	static DestroyAndDelete = function(_uuid) {

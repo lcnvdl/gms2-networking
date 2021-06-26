@@ -6,3 +6,6 @@ Different sync var types.
 
 # Example 3
 Chat example using custom packages.
+
+# Example 4
+Reuse an existing instance instead of creating new ones.
