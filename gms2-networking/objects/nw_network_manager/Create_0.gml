@@ -53,7 +53,9 @@ function startServer() {
 	catch(err) {
 		show_error(err, false);
 		serverSocket = -1;
-	}	
+	}
+
+	return serverSocket;
 }
 
 function startClient() {
@@ -69,7 +71,9 @@ function startClient() {
 	catch(err) {
 		show_error(err, false);
 		serverSocket = -1;
-	}	
+	}
+
+	return serverSocket;
 }
 
 function nwSetCamera(obj) {

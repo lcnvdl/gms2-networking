@@ -14,6 +14,8 @@ https://github.com/lcnvdl/gms2-networking
 
 Developed by L. Rasente
 
+https://forjagames.itch.io
+
 https://lrasente.tumblr.com
 
 https://github.com/lcnvdl

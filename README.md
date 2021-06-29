@@ -18,6 +18,9 @@ Auto-magic Networking System for Game Maker Studio +2.3.
 
 [Diagram code](./docs/Diagrams/class_diagram.txt)
 
+## Getting started
+[Getting Started](./docs/GETTING_STARTED.md)
+
 ## Contributing
 
 ### Guidelines

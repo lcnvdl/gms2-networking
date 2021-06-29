@@ -1,12 +1,9 @@
-function nw_start_client() {
-	return global.nwNetworkManager.startClient();	
-}
-
-function nw_start_server() {
-	return global.nwNetworkManager.startServer();	
-}
-
+/// @function nw_configure(ip, port)
+/// @param {string} ip - Server IP.
+/// @param {real} port - Server Port.
+/// @description Sets up the connection address.
 function nw_configure(ip, port) {
+	assert_is_true(global.nwNetworkManager.offline, "The game already has an open connection.");
 	assert_is_string(ip);
 	assert_is_number(port);
 	
@@ -14,10 +11,44 @@ function nw_configure(ip, port) {
 	global.nwNetworkManager.networkSettings.port = port;
 }
 
+/// @function nw_start_client()
+/// @description Starts the systen in client mode, connecting it to the server.
+/// @return {Socket} Client socket.
+function nw_start_client() {
+	return global.nwNetworkManager.startClient();	
+}
+
+/// @function nw_start_server()
+/// @description Starts the system in server mode.
+/// @return {Socket} Server socket.
+function nw_start_server() {
+	return global.nwNetworkManager.startServer();	
+}
+
+/// @function nw_add_sender(instance, _uuid, *opts)
+/// @description 	Registers a game object as a Sender. A Sender it's an instance 
+///								responsible to replicate its values to the Receivers. 
+///								When a Sender is created, the system creates a Receiver 
+///								instance in each network node. The Receivers receive
+///								information from the senders, like the Position (x, y), the
+///								image_angle, etc.  You can add more synchronization variables.
+///								Default synchronized variables: 
+///									x, y, image_alpha, image_angle, image_single
+/// @param {instance} instance - Instance ID.
+/// @param {string|undefined} _uuid - UUID (string). If it's undefined, an unique UUID is automatically generated.
+/// @param {*} [opts] - Custom settings.
+/// @return {string} Final UUID.
 function nw_add_sender(instance, _uuid) {
 	return global.nwNetworkManager.nwRegisterObjectAsSyncSender(instance, _uuid, argument_count > 2 ? argument[2] : undefined);
 }
 
+/// @function nw_add_empty_sender(instance, _uuid)
+/// @description 	Registers a game object as a Sender. The empty sender has no 
+///								synchronization variables by default. You can add more 
+///								synchronized values.
+/// @param {instance} instance - Instance ID.
+/// @param {string|undefined} _uuid - UUID (string). If it's undefined, an unique UUID is automatically generated.
+/// @return {string} Final UUID.
 function nw_add_empty_sender(instance, _uuid) {
 	var _opts = { 
 		emptySender: true 
