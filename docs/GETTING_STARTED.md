@@ -7,7 +7,7 @@
   - [3. Examples](#3-examples)
 
 ## 1. Important files
-* /Scripts/Gms2_Networking/nw_public_api
+* /Scripts/Gms2_Networking/Api/*
   * All the public functions of the engine.
 * /Objects/Gms2_Networking/nw_network_manager
   * The manager of the engine. _It can be overriden if you want to customize some behaviours._

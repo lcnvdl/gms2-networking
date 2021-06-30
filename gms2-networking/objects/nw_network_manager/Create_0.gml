@@ -120,7 +120,7 @@ function nwSend(_socket, _name, _data) {
 	engine.send(sendBuffer, _socket, NwMessageType.syncPackage, _package);
 }
 
-function callRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall) {
+function callRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall, callback) {
 	var existing = undefined;
 	var _uuid = instanceUuid;
 	with(all) {
@@ -132,7 +132,7 @@ function callRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall) {
 	}
 	
 	if (!is_undefined(existing)) {
-		var rpc = instance.rpcFunctions[$ fnName];
+		var rpc = existing.rpcFunctions[$ fnName];
 		var isSender = _sendersMgr.Exists(_uuid);
 		var isReceiver = !isSender;
 		
@@ -143,15 +143,22 @@ function callRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall) {
 			(rpc.allowance == RpcFunctionCallerAllowance.Receiver && isReceiver) ||
 			(rpc.allowance == RpcFunctionCallerAllowance.Sender && isSender)
 		) {
+			if (!variable_instance_exists(existing, "rpcWaiters")) {
+				existing.rpcWaiters = {};
+			}
+			
 			for(var i = 0; i < array_length(rpc.executors); i++) {
 				var executor = rpc.executors[i];
 				var package = {
-					id: instanceUuid, 
+					id: getUuid(),
+					instance: instanceUuid, 
 					name: fnName, 
 					args: fnArgs,
 					from: -1,
 					to: executor
 				};
+
+				var waitForReply = false;
 				
 				if (executor == RpcFunctionExecutor.Owner) {
 					if (id == existing) {
@@ -169,6 +176,7 @@ function callRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall) {
 					else {
 						package.from = RpcFunctionExecutor.Server;
 						nwBroadcast(NwMessageType.rpcCall, package);
+						waitForReply = true;
 					}
 				}
 				else if (executor == RpcFunctionExecutor.Server) {
@@ -179,21 +187,24 @@ function callRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall) {
 						if (isFirstCall) {
 							package.from = RpcFunctionExecutor.Client;
 							engine.send(sendBuffer, _socket, NwMessageType.rpcCall, package);
+							waitForReply = true;
 						}
 					}
 				}
 				else if (executor == RpcFunctionExecutor.Receiver) {
-					if (isReceiver){
+					if (isReceiver) {
 						rpc.Call(fnArgs);
 					}
 					else {	//	Sender
 						if (nw_is_client()) {
 							package.from = RpcFunctionExecutor.Sender;
-							engine.send(sendBuffer, _socket, NwMessageType.rpcCall, package);	
+							engine.send(sendBuffer, _socket, NwMessageType.rpcCall, package);
+							waitForReply = true;
 						}
 						else if (nw_is_server()) {
 							package.from = RpcFunctionExecutor.Sender;
 							nwBroadcast(NwMessageType.rpcCall, package);	
+							waitForReply = true;
 						}
 					}
 				}
@@ -201,6 +212,10 @@ function callRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall) {
 					if (isSender) {
 						rpc.Call(fnArgs);
 					}
+				}
+			
+				if (waitForReply) {
+					existing.rpcWaiters[$ package.id] = { package: package, callback: callback, timeout: 30000 };
 				}
 			}
 		}

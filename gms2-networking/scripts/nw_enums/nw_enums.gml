@@ -4,7 +4,8 @@ enum NwMessageType {
 	syncObjectDelete,
 	syncClientLocation,
 	syncPackage,
-	rpcCall
+	rpcCall,
+	rpcCallReply
 }
 
 enum SmoothType {

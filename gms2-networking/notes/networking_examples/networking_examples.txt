@@ -9,3 +9,6 @@ Chat example using custom packages.
 
 # Example 4
 Reuse an existing instance instead of creating new ones.
+
+# Example 5
+Calling remote functions using RPC.
