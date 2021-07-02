@@ -92,3 +92,9 @@ function nw_subscription_destroy(subscriptionIndex) {
 	assert_is_number(subscriptionIndex);
 	global.nwNetworkManager.unsubscribe(subscriptionIndex);
 }
+
+/// @function nw_clean_up()
+/// @description Destroy all the sockets and the network manager.
+function nw_clean_up() {
+	global.nwNetworkManager.cleanUpNetworkManager();
+}

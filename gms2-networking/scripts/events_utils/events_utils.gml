@@ -4,7 +4,12 @@ function evListener(instance){
 		subscriptions = ds_list_create();
 
 		cleanUpSubscriptions = function() {
+			if(is_undefined(subscriptions)) {
+				return;	
+			}
+			
 			ds_list_destroy(subscriptions);
+			lastSubscriptionId = 0;
 			subscriptions = undefined;
 		}
 

@@ -6,10 +6,13 @@ function nw_ReceiversManager() constructor {
 	};
 	
 	static Dispose = function() {
-		ds_map_foreach(receivers, function(receiver) {
-			receiver.Dispose();
-		}, undefined);
-		ds_map_destroy(receivers);
+		if (!is_undefined(receivers)) {
+			ds_map_foreach(receivers, function(receiver) {
+				receiver.Dispose();
+			}, undefined);
+			ds_map_destroy(receivers);
+			receivers = undefined;
+		}
 	};
 	
 	static Get = function(_uuid) {

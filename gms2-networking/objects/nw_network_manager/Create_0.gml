@@ -236,6 +236,33 @@ function registerRpcFunction(instance, name, fnCall, _opts) {
 	instance.rpcFunctions[$ name] = new nw_RpcFunction(name, fnCall, _opts);
 }
 
+function cleanUpNetworkManager() {
+	//	Sockets
+	if (!is_undefined(engine)) {
+		engine.destroyBuffer(sendBuffer);
+		engine.destroySocket(serverSocket);
+	}
+
+	//	Server controller
+	if (!is_undefined(_serverController)) {
+		_serverController.Dispose();
+		_serverController = undefined;
+	}
+
+	//	Senders and receivers
+	_sendersMgr.Dispose();
+	_receiversMgr.Dispose();
+
+	//	Clients (connections)
+	_clientsMgr.Dispose();
+
+	//	Events
+	cleanUpSubscriptions();
+
+	//	Finish
+	offline = true;
+}
+
 #endregion	//	Public functions
 
 //	Internal functions

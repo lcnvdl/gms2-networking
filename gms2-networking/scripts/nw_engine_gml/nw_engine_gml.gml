@@ -4,7 +4,7 @@ function getGmlNetworkEngine() {
 		connect: _nwGmlConnect,
 		receive: _nwGmlReceive,
 		send: _nwGmlSend,
-		destroySocket: function(_) { },
+		destroySocket: _nwGmlDestroySocket,
 		createBuffer: _nwGmlCreateBuffer,
 		destroyBuffer: _nwGmlDestroyBuffer,
 		evStep: undefined,
@@ -18,6 +18,10 @@ function _nwGmlCreateBuffer(bufferSize, bufferType, alignment) {
 
 function _nwGmlDestroyBuffer(bufferId) {
 	buffer_delete(bufferId);
+}
+
+function _nwGmlDestroySocket(socketId) {
+	network_destroy(socketId);
 }
 
 function _nwGmlServe(port){

@@ -111,10 +111,13 @@ function nw_SendersManager() constructor {
 	};
 	
 	static Dispose = function() {
-		ds_map_foreach(senders, function(sender) {
-			sender.Dispose();
-		}, undefined);
-		ds_map_destroy(senders);	
+		if(!is_undefined(senders)) {
+			ds_map_foreach(senders, function(sender) {
+				sender.Dispose();
+			}, undefined);
+			ds_map_destroy(senders);	
+			senders = undefined;
+		}
 	};
 }
 
