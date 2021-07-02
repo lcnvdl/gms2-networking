@@ -27,6 +27,19 @@ function nw_send_to(socket, eventName, data) {
 	return true;
 }
 
+/// @function nw_custom_send_to(socket, eventName, data)
+/// @description Sends an event with a struct to a socket.
+///	@param {real} socket - Socket identifier.
+///	@param {string} eventName - Name that identifies the event.
+///	@param {struct} data - Struct to send.
+///	@return {boolean} True 
+function nw_custom_send_to(socket, eventName, data) {
+	assert_is_not_undefined(socket);
+	assert_is_string(eventName);
+	global.nwNetworkManager.nwCustomSend(socket, eventName, data);
+	return true;
+}
+
 /// @function nw_broadcast(socket, eventName, data)
 /// @description Sends an event with a struct to all connected sockets. This can run only in server mode.
 ///	@param {string} eventName - Name that identifies the event.

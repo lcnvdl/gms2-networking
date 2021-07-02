@@ -60,8 +60,22 @@ function nw_get_senders_mgr() {
 
 /// @function nw_get_sender(_uuid)
 /// @description Gets a specific sender.
-/// @return {Sender} Sender.
+/// @return {Sender|undefined} Sender.
 function nw_get_sender(_uuid) {
 	//	assert_is_string(_uuid);	//	Commented in order to improve performance
 	return global.nwNetworkManager.getSendersManager().Get(_uuid);
+}
+
+/// @function nw_sender_exists(_uuid)
+/// @description Checks if the sender exists.
+/// @return {boolean} True or false.
+function nw_sender_exists(_uuid) {
+	return global.nwNetworkManager.getSendersManager().Exists(_uuid);
+}
+
+/// @function nw_instance_get_uuid(_uuid)
+/// @description Gets the UUID of a Network Instance.
+/// @return {string} UUID.
+function nw_instance_get_uuid(instance) {
+	return instance.nwUuid;	
 }

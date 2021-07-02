@@ -107,6 +107,14 @@ function nwSendBroadcast(_name, _data) {
 	nwBroadcast(NwMessageType.syncPackage, _package);
 }
 
+function nwCustomSend(_socket, _type, _data) {
+	assert_is_not_undefined(_socket);
+	assert_is_not_undefined(_data);
+	assert_is_string(_name);
+	
+	engine.send(sendBuffer, _socket, _type, _data);
+}
+
 function nwSend(_socket, _name, _data) {
 	assert_is_not_undefined(_socket);
 	assert_is_not_undefined(_data);
@@ -120,7 +128,7 @@ function nwSend(_socket, _name, _data) {
 	engine.send(sendBuffer, _socket, NwMessageType.syncPackage, _package);
 }
 
-function callRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall, callback) {
+function callInstanceRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall, callback) {
 	var existing = undefined;
 	var _uuid = instanceUuid;
 	with(all) {
@@ -158,61 +166,8 @@ function callRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall, callback) {
 					to: executor
 				};
 
-				var waitForReply = false;
-				
-				if (executor == RpcFunctionExecutor.Owner) {
-					if (id == existing) {
-						rpc.Call(fnArgs);
-					}
-				}
-				else if (executor == RpcFunctionExecutor.Client) {
-					if (nw_is_client()) {
-						rpc.Call(fnArgs);
-						if (isFirstCall) {
-							package.from = RpcFunctionExecutor.Client;
-							engine.send(sendBuffer, _socket, NwMessageType.rpcCall, package);
-						}
-					}
-					else {
-						package.from = RpcFunctionExecutor.Server;
-						nwBroadcast(NwMessageType.rpcCall, package);
-						waitForReply = true;
-					}
-				}
-				else if (executor == RpcFunctionExecutor.Server) {
-					if (nw_is_server()) {
-						rpc.Call(fnArgs);
-					}
-					else {
-						if (isFirstCall) {
-							package.from = RpcFunctionExecutor.Client;
-							engine.send(sendBuffer, _socket, NwMessageType.rpcCall, package);
-							waitForReply = true;
-						}
-					}
-				}
-				else if (executor == RpcFunctionExecutor.Receiver) {
-					if (isReceiver) {
-						rpc.Call(fnArgs);
-					}
-					else {	//	Sender
-						if (nw_is_client()) {
-							package.from = RpcFunctionExecutor.Sender;
-							engine.send(sendBuffer, _socket, NwMessageType.rpcCall, package);
-							waitForReply = true;
-						}
-						else if (nw_is_server()) {
-							package.from = RpcFunctionExecutor.Sender;
-							nwBroadcast(NwMessageType.rpcCall, package);	
-							waitForReply = true;
-						}
-					}
-				}
-				else if (executor == RpcFunctionExecutor.Sender) {
-					if (isSender) {
-						rpc.Call(fnArgs);
-					}
-				}
+				var executorInstance = nw_RpcExecutorFactory(executor, rpc, package);
+				var waitForReply = executorInstance.Process(isFirstCall);
 			
 				if (waitForReply) {
 					existing.rpcWaiters[$ package.id] = { package: package, callback: callback, timeout: 30000 };
@@ -224,7 +179,7 @@ function callRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall, callback) {
 	return -1;
 }
 
-function registerRpcFunction(instance, name, fnCall, _opts) {
+function registerInstanceRpcFunction(instance, name, fnCall, _opts) {
 	if (!variable_instance_exists(instance, "nwUuid")) {
 		throw "The instance must be a sender or a receiver";	
 	}
