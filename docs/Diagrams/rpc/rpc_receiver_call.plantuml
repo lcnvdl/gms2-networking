@@ -1,0 +1,6 @@
+@startuml
+Actor -> Receiver: fnName()
+Receiver -> Sender: ExecuteRpcFunction(fnName)
+Sender -> Sender: Run(fnName)
+Sender --> Receiver: Rpc Result
+@enduml

@@ -1,0 +1,6 @@
+@startuml
+Actor -> Sender: fnName()
+Sender -> EachReceiver: ExecuteRpcFunction(fnName)
+EachReceiver -> EachReceiver: Run(fnName)
+EachReceiver --> Sender: ACK
+@enduml

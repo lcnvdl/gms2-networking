@@ -11,12 +11,12 @@ Auto-magic Networking System for Game Maker Studio +2.3.
 ### More features...
 * **Simple messages system.** _Send an receive custom objects (like [Socket.io](https://github.com/socketio/socket.io)), recommended for advanced developers._
 * **Global variables synchronization.**
-* **Remote Procedure Calls (RPC) _//Work in progress//_.** _You can call instance functions, regardless of where they are on the network._
+* **Remote Procedure Calls (RPC) _//Work in progress//_.** _You can call instance functions, regardless of where they are on the network._ _[Read more](./docs/RPC.md)_
 
 ## Diagram
 ![Class Diagram](https://www.lucianorasente.com/images/class_diagram.png)
 
-[Diagram code](./docs/Diagrams/class_diagram.txt)
+[Diagram code](./docs/Diagrams/class_diagram.plantuml)
 
 ## Getting started
 [Getting Started](./docs/GETTING_STARTED.md)
