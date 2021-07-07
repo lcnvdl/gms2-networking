@@ -19,6 +19,7 @@
     {"id":{"name":"nw_rpc_executor_owner","path":"scripts/nw_rpc_executor_owner/nw_rpc_executor_owner.yy",},"order":3,},
     {"id":{"name":"nw_macros_events","path":"scripts/nw_macros_events/nw_macros_events.yy",},"order":1,},
     {"id":{"name":"nw_clients_manager","path":"scripts/nw_clients_manager/nw_clients_manager.yy",},"order":1,},
+    {"id":{"name":"nw_example_5_room","path":"rooms/nw_example_5_room/nw_example_5_room.yy",},"order":5,},
     {"id":{"name":"cm_assert_example_o","path":"objects/cm_assert_example_o/cm_assert_example_o.yy",},"order":0,},
     {"id":{"name":"nw_circle_o","path":"objects/nw_circle_o/nw_circle_o.yy",},"order":0,},
     {"id":{"name":"nw_examples_selector","path":"objects/nw_examples_selector/nw_examples_selector.yy",},"order":6,},
@@ -52,6 +53,7 @@
     {"id":{"name":"nw_network_demo1_o","path":"objects/nw_network_demo1_o/nw_network_demo1_o.yy",},"order":2,},
     {"id":{"name":"nw_receiver","path":"scripts/nw_receiver/nw_receiver.yy",},"order":0,},
     {"id":{"name":"nw_engine_gml","path":"scripts/nw_engine_gml/nw_engine_gml.yy",},"order":0,},
+    {"id":{"name":"nw_network_demo5_o","path":"objects/nw_network_demo5_o/nw_network_demo5_o.yy",},"order":1,},
     {"id":{"name":"math","path":"scripts/math/math.yy",},"order":1,},
     {"id":{"name":"networking_examples","path":"notes/networking_examples/networking_examples.yy",},"order":0,},
     {"id":{"name":"nw_singleton_example_o","path":"objects/nw_singleton_example_o/nw_singleton_example_o.yy",},"order":0,},
@@ -93,6 +95,7 @@
     {"roomId":{"name":"nw_example_1_room","path":"rooms/nw_example_1_room/nw_example_1_room.yy",},},
     {"roomId":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
     {"roomId":{"name":"nw_example_4_room","path":"rooms/nw_example_4_room/nw_example_4_room.yy",},},
+    {"roomId":{"name":"nw_example_5_room","path":"rooms/nw_example_5_room/nw_example_5_room.yy",},},
   ],
   "Folders": [
     {"folderPath":"folders/Sprites.yy","order":1,"resourceVersion":"1.0","name":"Sprites","tags":[],"resourceType":"GMFolder",},

@@ -14,7 +14,12 @@ function nw_rpc_instance_register_function(instanceOrUuid, name, fnCall) {
 		instanceUuid = instanceOrUuid.nwUuid;
 	}
 
-	var _opts = argument_count > 3 ? argument[3] : undefined;
+	var _opts = argument_count > 3 ? argument[3] : {};
+	
+	if(is_undefined(_opts)) {
+		_opts = {};	
+	}
+	
 	global.nwNetworkManager.registerInstanceRpcFunction(instanceUuid, name, fnCall, _opts);
 }
 
@@ -28,5 +33,5 @@ function nw_rpc_instance_call_function(instanceOrUuid, fnName, fnArgs, fnCallbac
 		instanceUuid = instanceOrUuid.nwUuid;
 	}
 
-	global.nwNetworkManager.callInstanceRpcFunction(instanceUuid, fnName, fnArgs, fnCallback);	
+	global.nwNetworkManager.callInstanceRpcFunction(instanceUuid, fnName, fnArgs, true, fnCallback);	
 }

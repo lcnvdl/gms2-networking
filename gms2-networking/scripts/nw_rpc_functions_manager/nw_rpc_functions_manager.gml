@@ -10,8 +10,15 @@ function nw_RpcFunctionsManager(_instance) constructor {
 	instance = _instance;
 	
 	static Register = function(name, fnCall, _opts) {
-		rpcFunctions[$ name] = new nw_RpcFunction(name, fnCall, _opts);	
+		rpcFunctions[$ name] = new nw_RpcFunction(instance, name, fnCall, _opts);	
 	};
+	
+	static LocalCall = function(_package) {
+		var rpc = rpcFunctions[$ _package.name];
+		var executorInstance = new nw_RpcExecutorOwner(rpc, _package);
+		executorInstance.Process(false);
+		return executorInstance.result;
+	}
 	
 	static Call = function(fnName, fnArgs, isFirstCall, callback) {
 		var rpc = rpcFunctions[$ fnName];
@@ -28,7 +35,7 @@ function nw_RpcFunctionsManager(_instance) constructor {
 		if (rpc.allowance == RpcFunctionCallerAllowance.Everyone ||
 			(rpc.allowance == RpcFunctionCallerAllowance.Client && nw_is_client()) ||
 			(rpc.allowance == RpcFunctionCallerAllowance.Server && nw_is_server()) ||
-			(rpc.allowance == RpcFunctionCallerAllowance.Owner && id == instance) ||
+			(rpc.allowance == RpcFunctionCallerAllowance.Owner && rpc.instance == instance) ||
 			(rpc.allowance == RpcFunctionCallerAllowance.Receiver && isReceiver) ||
 			(rpc.allowance == RpcFunctionCallerAllowance.Sender && isSender)
 		) {
@@ -40,7 +47,8 @@ function nw_RpcFunctionsManager(_instance) constructor {
 					name: fnName, 
 					args: fnArgs,
 					from: -1,
-					to: executor
+					to: executor,
+					withReturn: false
 				};
 
 				var executorInstance = nw_RpcExecutorFactory(executor, rpc, package);
@@ -49,9 +57,25 @@ function nw_RpcFunctionsManager(_instance) constructor {
 				if (waitForReply) {
 					rpcWaiters[$ package.id] = { package: package, callback: callback, timeout: 30000 };
 				}
+				else {
+					if (!is_undefined(callback)) {
+						var response = new nw_RPCResponse();
+						try {
+							response.data = executorInstance.result;
+							callback(response);	
+						}
+						catch(err) {
+							response.data = err;
+							response.isValid = false;
+							callback(response);
+						}
+					}
+				}
 			}
+			
+			return true;
 		}
 	
-		return -1;
+		return false;
 	}
 }

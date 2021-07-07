@@ -5,6 +5,8 @@ enum NwMessageType {
 	syncClientLocation,
 	syncPackage,
 	rpcCall,
+	rpcCallExecute,
+	rpcCallReplicate,
 	rpcCallReply
 }
 

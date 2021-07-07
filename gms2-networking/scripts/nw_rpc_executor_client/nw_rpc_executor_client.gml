@@ -1,16 +1,21 @@
+/// @desc The execution target is a client.
 function nw_RpcExecutorClient(_rpc, _package) : nw_RpcExecutorBase(_rpc, _package) constructor {
 	static Process = function(isFirstCall) {
 		if (nw_is_client()) {
-			rpc.Call(GetArgs());
+			//	Run in local code
+			result = rpc.Call(GetArgs());
+			
 			if (isFirstCall) {
+				//	Replication
 				package.from = RpcFunctionExecutor.Client;
 				var _socket = nw_get_socket();
-				nw_custom_send_to( _socket, NwMessageType.rpcCall, package);
+				nw_custom_send_to(_socket, NwMessageType.rpcCallReplicate, package);
 			}
 		}
-		else {
+		else if(nw_is_server()) {
 			package.from = RpcFunctionExecutor.Server;
-			nw_broadcast(NwMessageType.rpcCall, package);
+			package.withReply = true;
+			nw_broadcast(NwMessageType.rpcCallExecute, package);
 			return true;
 		}
 		

@@ -1,4 +1,4 @@
-function RPCResponse() constructor {
+function nw_RPCResponse() constructor {
 	data = {};
 	isValid = true;
 }

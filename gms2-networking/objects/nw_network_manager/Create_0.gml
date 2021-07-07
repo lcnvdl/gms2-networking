@@ -24,6 +24,7 @@ networkSettings = {
 _clientsMgr = new nw_ClientsManager();
 _sendersMgr = new nw_SendersManager();
 _receiversMgr = new nw_ReceiversManager();
+_rpcMgr = new nw_RpcManager();
 _serverController = undefined;
 
 lastSync = 0;
@@ -95,6 +96,19 @@ function nwRegisterObjectAsSyncSender(instance, _uuid, _opts) {
 	return newId;
 }
 
+function nwSendBroadcastExclude(_name, _data, exclude) {
+	assert_is_not_undefined(_data);
+	assert_is_string(_name);
+	assert_is_array(exclude);
+	
+	var _package = {
+		name: _name,
+		data: _data
+	};
+	
+	nwBroadcastExclude(NwMessageType.syncPackage, _package, exclude);
+}
+
 function nwSendBroadcast(_name, _data) {
 	assert_is_not_undefined(_data);
 	assert_is_string(_name);
@@ -129,66 +143,27 @@ function nwSend(_socket, _name, _data) {
 }
 
 function callInstanceRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall, callback) {
-	var existing = undefined;
-	var _uuid = instanceUuid;
-	with(all) {
-		if(variable_instance_exists(id, "nwUuid")) {
-			if(nwUuid == _uuid) {
-				existing = id;	
-			}
-		}
-	}
+	var existing = nw_get_instance(instanceUuid);
 	
-	if (!is_undefined(existing)) {
-		var rpc = existing.rpcFunctions[$ fnName];
-		var isSender = _sendersMgr.Exists(_uuid);
-		var isReceiver = !isSender;
-		
-		if (rpc.allowance == RpcFunctionCallerAllowance.Everyone ||
-			(rpc.allowance == RpcFunctionCallerAllowance.Client && nw_is_client()) ||
-			(rpc.allowance == RpcFunctionCallerAllowance.Server && nw_is_server()) ||
-			(rpc.allowance == RpcFunctionCallerAllowance.Owner && id == existing) ||
-			(rpc.allowance == RpcFunctionCallerAllowance.Receiver && isReceiver) ||
-			(rpc.allowance == RpcFunctionCallerAllowance.Sender && isSender)
-		) {
-			if (!variable_instance_exists(existing, "rpcWaiters")) {
-				existing.rpcWaiters = {};
-			}
-			
-			for(var i = 0; i < array_length(rpc.executors); i++) {
-				var executor = rpc.executors[i];
-				var package = {
-					id: getUuid(),
-					instance: instanceUuid, 
-					name: fnName, 
-					args: fnArgs,
-					from: -1,
-					to: executor
-				};
-
-				var executorInstance = nw_RpcExecutorFactory(executor, rpc, package);
-				var waitForReply = executorInstance.Process(isFirstCall);
-			
-				if (waitForReply) {
-					existing.rpcWaiters[$ package.id] = { package: package, callback: callback, timeout: 30000 };
-				}
-			}
-		}
-	}
+	assert_is_not_undefined(existing);
 	
-	return -1;
+	return existing.nwRpc.Call(fnName, fnArgs, isFirstCall, callback);
 }
 
-function registerInstanceRpcFunction(instance, name, fnCall, _opts) {
+function registerInstanceRpcFunction(instanceUuid, name, fnCall, _opts) {	
+	var instance = nw_get_instance(instanceUuid);
+	
+	assert_is_not_undefined(instance);
+	
 	if (!variable_instance_exists(instance, "nwUuid")) {
 		throw "The instance must be a sender or a receiver";	
 	}
 	
-	if (!variable_instance_exists(instance, "rpcFunctions")) {
-		instance.rpcFunctions = {};
+	if (!variable_instance_exists(instance, "nwRpc")) {
+		instance.nwRpc = new nw_RpcFunctionsManager(instance);
 	}
 	
-	instance.rpcFunctions[$ name] = new nw_RpcFunction(name, fnCall, _opts);
+	instance.nwRpc.Register(name, fnCall, _opts);
 }
 
 function cleanUpNetworkManager() {
@@ -269,6 +244,19 @@ function nwBroadcast(msgId, data) {
 	}, { msgId: msgId, data: data })	
 }
 
+function nwBroadcastExclude(msgId, data, socketsToExclude) {
+	show_debug_message("broadcast (xclude) " + string (msgId) + ":" + json_stringify(data));
+	
+	ds_list_foreach(_clientsMgr.clients, function(client, index, args) {
+		var idx = array_findIndex(args.xclude, function(v, i, _client) {
+			return v == _client;
+		}, client);
+		
+		if (idx == -1) {
+			engine.send(sendBuffer, client, args.msgId, args.data);
+		}
+	}, { msgId: msgId, data: data, xclude: socketsToExclude })	
+}
 
 function addNewClient(clientSocket) {
 	//	"Global" Calls because of the transaction scope
@@ -363,6 +351,13 @@ function _nwClientProcessPackage(pck) {
 	else if (pck.id == NwMessageType.syncObjectCreate) {
 	}
 	else if (pck.id == NwMessageType.rpcCall) {
+		_rpcMgr.ProcessRpcCallAsClient(pck, socket);
+	}
+	else if (pck.id == NwMessageType.rpcCallReplicate) {
+		throw "Invalid package ID.";
+	}
+	else if (pck.id == NwMessageType.rpcCallExecute) {
+		_rpcMgr.ProcessRpcCallExecuteAsClient(pck, socket);
 	}
 	else if (pck.id == NwMessageType.syncObjectDelete) {
 		_receiversMgr.DestroyAndDelete(pck.data.uuid);
@@ -392,6 +387,13 @@ function _onReceiveServerPacket(buffer, socket) {
 	else if (pck.id == NwMessageType.syncObjectCreate) {
 	}
 	else if (pck.id == NwMessageType.rpcCall) {
+		_rpcMgr.ProcessRpcCallAsServer(pck, socket);
+	}
+	else if (pck.id == NwMessageType.rpcCallReplicate) {
+		_rpcMgr.ProcessRpcCallReplicateAsServer(pck, socket);
+	}
+	else if (pck.id == NwMessageType.rpcCallExecute) {
+		_rpcMgr.ProcessRpcCallExecuteAsServer(pck, socket);
 	}
 	else if (pck.id == NwMessageType.syncClientLocation) {
 		var data = _clientsMgr.GetInfo(socket);

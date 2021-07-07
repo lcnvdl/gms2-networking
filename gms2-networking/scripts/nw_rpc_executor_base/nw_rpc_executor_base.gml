@@ -1,6 +1,7 @@
 function nw_RpcExecutorBase(_rpc, _package) constructor {
 	package = _package;
 	rpc = _rpc;
+	result = undefined;
 	
 	static GetInstanceUuid = function() {
 		return package.instance;	
