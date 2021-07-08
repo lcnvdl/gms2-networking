@@ -40,6 +40,11 @@ function nw_ReceiversManager() constructor {
 				//	TODO	Send value	
 			}
 		}, receiver);
+		
+		//	Rpc
+		if (variable_instance_exists(receiver, "nwRpc")) {
+			receiver.nwRpc.Update(global.nwNetworkManager._dt);
+		}
 	};
 	
 	static ReceiveDataFromSender = function(info, socketOwnerOfSender) {	

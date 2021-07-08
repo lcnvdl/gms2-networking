@@ -12,23 +12,34 @@ if(nw_is_server()) {
 		};
 	};
 	
-	// var rpcOpts = { allowance: RpcFunctionCallerAllowance.Sender, executors: [RpcFunctionCallerAllowance.Sender] };
-	var rpcOpts = { isOwner: true };
-	nw_rpc_instance_register_function(id, "getServerInfo", rpcGetServerInfo, rpcOpts);
+	nw_rpc_register("getServerInfo", rpcGetServerInfo);
+	
+	sendBroadcast = function() {
+		nw_rpc_sender_broadcast("showMessage", { msg: "Hello world!" }, function() {
+			show_debug_message("Broadcast sent");	
+		});
+	};
 }
 else {
 	nw_singleton_receiver(id, "rpc_example");
 	
-	//	Allow Receiver to call the RPC function
-	var rpcOpts = { allowance: RpcFunctionCallerAllowance.Receiver, executors: [RpcFunctionCallerAllowance.Sender] };
-	nw_rpc_instance_register_function(id, "getServerInfo", undefined, rpcOpts);
+	nw_rpc_register("showMessage", function(args) {
+		show_message(args.msg);
+	});
 }
 
+getServerInfoCallback = function(response) {
+	if (!is_undefined(response) && response.isValid) {
+		var data = response.data;
+		rpc_example_o.currentOsVersion = data;
+	}
+};
+
 getServerInfo = function() {
-	nw_rpc_instance_call_function(id, "getServerInfo", {}, function(response) {
-		if (!is_undefined(response) && response.isValid) {
-			var data = response.data;
-			rpc_example_o.currentOsVersion = data;
-		}
-	});
+	if(nw_is_server()) {
+		nw_rpc_self_call("getServerInfo", {}, getServerInfoCallback);
+	}
+	else {
+		nw_rpc_receiver_call("getServerInfo", {}, getServerInfoCallback);
+	}
 };

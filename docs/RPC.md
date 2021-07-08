@@ -100,3 +100,11 @@ nw_rpc_sender_broadcast("my_function", myArgs, myCallback);
 ```
 The callback will run once the Sender receives all ACK signals.
 
+### 4.4. Rpc Call - Self-call
+The entity calls its own Rpc Function.
+
+#### How to call it?
+```javascript
+nw_rpc_self_call("my_function", myArgs, myCallback);
+```
+

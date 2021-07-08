@@ -9,10 +9,37 @@ function nw_RpcFunctionsManager(_instance) constructor {
 	rpcWaiters = {};
 	instance = _instance;
 	
-	static Register = function(name, fnCall, _opts) {
-		rpcFunctions[$ name] = new nw_RpcFunction(instance, name, fnCall, _opts);	
+	static Register = function(name, fnCall) {
+		rpcFunctions[$ name] = new nw_RpcFunction(instance, name, fnCall);	
 	};
 	
+	static CallVoidFunction = function(fnName, fnArgs) {
+		rpcFunctions[$ fnName].Call(fnArgs);
+	};
+	
+	static CallFunction = function(fnName, fnArgs) {
+		var result = rpcFunctions[$ fnName].Call(fnArgs);
+		return result;
+	};
+	
+	static AddWaiter = function(waiterId, fnCallback) {
+		rpcWaiters[$ waiterId] = {
+			id: waiterId,
+			cb: fnCallback,
+			ttl: 30
+		};
+	};
+	
+	static Update = function(dt) {
+		struct_foreach(rpcWaiters, function(waiter, k, _dt) {
+			waiter.ttl -= _dt;
+			if (waiter.ttl <= 0) {
+				variable_struct_remove(waiter, k);	
+			}
+		}, dt);
+	};
+	
+	///	@deprecated
 	static LocalCall = function(_package) {
 		var rpc = rpcFunctions[$ _package.name];
 		var executorInstance = new nw_RpcExecutorOwner(rpc, _package);
@@ -20,6 +47,7 @@ function nw_RpcFunctionsManager(_instance) constructor {
 		return executorInstance.result;
 	}
 	
+	///	@deprecated
 	static Call = function(fnName, fnArgs, isFirstCall, callback) {
 		var rpc = rpcFunctions[$ fnName];
 		var isSender = false;

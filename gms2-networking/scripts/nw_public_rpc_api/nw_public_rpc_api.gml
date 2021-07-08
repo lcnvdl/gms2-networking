@@ -4,6 +4,29 @@
 * @license MIT
 */
 
+function nw_rpc_register(fnName, fnCallback) {
+	global.nwNetworkManager.rpcRegisterFunction(id, fnName, fnCallback);
+}
+
+function nw_rpc_set_security(fnName, settings) {
+}
+
+function nw_rpc_sender_broadcast(fnName, fnArgs, fnCallback) {
+	global.nwNetworkManager.rpcSenderBroadcast(id, fnName, fnArgs, fnCallback);
+}
+
+function nw_rpc_self_call(fnName, fnArgs, fnCallback) {
+	global.nwNetworkManager.rpcSelfCall(id, fnName, fnArgs, fnCallback);
+}
+
+function nw_rpc_sender_call(fnName, fnArgs, fnCallback) {
+	global.nwNetworkManager.rpcSenderCall(id, fnName, fnArgs, fnCallback);
+}
+
+function nw_rpc_receiver_call(fnName, fnArgs, fnCallback) {
+}
+
+/// @deprecated
 function nw_rpc_instance_register_function(instanceOrUuid, name, fnCall) {	
 	var instanceUuid;
 	
@@ -23,6 +46,7 @@ function nw_rpc_instance_register_function(instanceOrUuid, name, fnCall) {
 	global.nwNetworkManager.registerInstanceRpcFunction(instanceUuid, name, fnCall, _opts);
 }
 
+/// @deprecated
 function nw_rpc_instance_call_function(instanceOrUuid, fnName, fnArgs, fnCallback) {
 	var instanceUuid;
 	

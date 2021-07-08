@@ -38,6 +38,11 @@ function nw_SendersManager() constructor {
 				_sender.UpdateSyncVariableFromSender(syncVar);
 			}
 		}, sender);
+		
+		//	Rpc
+		if (variable_instance_exists(sender, "nwRpc")) {
+			sender.nwRpc.Update(global.nwNetworkManager._dt);
+		}
 	};
 	
 	static Register = function(instance, _uuid, _opts) {

@@ -1,8 +1,28 @@
+/**
+* @file RPC Manager.
+* @author Forja Games <forjagames.com@gmail.com>
+* @license MIT
+*/
+
 function nw_RpcManager() constructor {
+	static BroadcastCall = function(pck) {
+		var instance = nw_get_instance(pck.id);			
+		if (!is_undefined(instance) && instance_exists(instance)) {
+			instance.nwRpc.CallVoidFunction(pck.fn, pck.args);
+		}
+	}
+	
+	static BroadcastReplicate = function(pck, socket) {
+		nw_broadcast_exclude(NwMessageType.rpcSenderBroadcastReplicate, pck, [socket]);
+	}
+	
+	
+	///	@deprecated
 	static ProcessRpcCallAsServer = function(pck, socket) {
 		
 	}
 	
+	///	@deprecated
 	static ProcessRpcCallReplicateAsServer = function(pck, socket) {
 		if (pck.to == RpcFunctionExecutor.Client) {
 			pck.waitForReply = false;
@@ -13,11 +33,12 @@ function nw_RpcManager() constructor {
 		}
 	}
 	
+	///	@deprecated
 	static ProcessRpcCallExecuteAsServer = function(pck, socket) {
 		var instance = nw_get_instance(pck.id);
 		if (!is_undefined(instance) && instance_exists(instance)) {
 			var shouldReply = pck.waitForReply;
-			instance.rpc.Call(package.name, package.args, false, undefined);
+			instance.rpc.Call(pck.name, pck.args, false, undefined);
 			if(shouldReply) {
 				var result = instance.rpc.result;
 				pck.result = result;
@@ -26,9 +47,11 @@ function nw_RpcManager() constructor {
 		}
 	}
 	
+	///	@deprecated
 	static ProcessRpcCallAsClient = function(pck, socket) {
 	}
 	
+	///	@deprecated
 	static ProcessRpcCallExecuteAsClient = function(pck, socket) {
 		var instance = nw_get_instance(pck.id);
 		if (!is_undefined(instance) && instance_exists(instance)) {

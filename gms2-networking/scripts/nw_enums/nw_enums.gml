@@ -4,10 +4,22 @@ enum NwMessageType {
 	syncObjectDelete,
 	syncClientLocation,
 	syncPackage,
+	///	@deprecated
 	rpcCall,
+	///	@deprecated
 	rpcCallExecute,
+	///	@deprecated
 	rpcCallReplicate,
-	rpcCallReply
+	///	@deprecated
+	rpcCallReply,
+	//	Server-sender to Client-receivers
+	rpcSenderBroadcastCall,
+	//	Client-sender to Server-Receiver (then Client-receivers)
+	rpcSenderBroadcastReplicate,
+	//	Client-sender to Server-receiver
+	rpcSenderFunctionCall,
+	//	Server-receiver replies to Client-Sender
+	rpcSenderFunctionReply
 }
 
 enum SmoothType {
