@@ -124,7 +124,7 @@ function nwSendBroadcast(_name, _data) {
 function nwCustomSend(_socket, _type, _data) {
 	assert_is_not_undefined(_socket);
 	assert_is_not_undefined(_data);
-	assert_is_string(_type);
+	assert_is_not_undefined(_type);
 	
 	engine.send(sendBuffer, _socket, _type, _data);
 }
@@ -142,12 +142,16 @@ function nwSend(_socket, _name, _data) {
 	engine.send(sendBuffer, _socket, NwMessageType.syncPackage, _package);
 }
 
-function rpcRegisterFunction(instanceIndex, fnName, fnCallback) {
-	_validateRpcArgs(instanceIndex, fnName);
-
+function rpcInitialize(instanceIndex) {
 	if (!variable_instance_exists(instanceIndex, "nwRpc")) {
 		instanceIndex.nwRpc = new nw_RpcFunctionsManager(instanceIndex);
 	}
+}
+
+function rpcRegisterFunction(instanceIndex, fnName, fnCallback) {
+	_validateRpcArgs(instanceIndex, fnName);
+
+	rpcInitialize(instanceIndex);
 	
 	instanceIndex.nwRpc.Register(fnName, fnCallback);
 }
@@ -157,20 +161,41 @@ function rpcSelfCall(instanceIndex, fnName, fnArgs, fnCallback) {
 	
 	var result = instanceIndex.nwRpc.CallFunction(fnName, fnArgs);
 	var response = new nw_RPCResponse();
-	response.data = result;
+	response.SetData(result);
 	
-	fnCallback(response);
+	fnCallback(response.Serialize());
+}
+
+function rpcReceiverCall(instanceIndex, fnName, fnArgs, fnCallback) {
+	_validateRpcArgs(instanceIndex, fnName);
+	
+	assert_is_true(nw_instance_is_receiver(instanceIndex));
+	
+	var _uuid = nw_instance_get_uuid(instanceIndex);
+	var _replyTo = getUuid();
+
+	instanceIndex.nwRpc.AddWaiter(_replyTo, fnCallback);
+	
+	if (nw_is_server()) {
+		var receiver = nw_instance_get_receiver(instanceIndex);
+		var receiverSocket = receiver.GetClient();
+		
+		nwCustomSend(receiverSocket, NwMessageType.rpcReceiverFunctionCall, { id: _uuid, fn: fnName, args: fnArgs, replyTo: _replyTo });
+	}
+	else {
+		//	TODO: The server must find the sender
+		nwCustomSend(nw_get_socket(), NwMessageType.rpcReceiverFunctionCall, { id: _uuid, fn: fnName, args: fnArgs, replyTo: _replyTo });
+	}
 }
 
 function rpcSenderCall(instanceIndex, fnName, fnArgs, fnCallback) {
 	_validateRpcArgs(instanceIndex, fnName);
+	
+	assert_is_true(nw_instance_is_sender(instanceIndex));
 	assert_is_true(nw_is_client(), "The RPC from senders can only be called in Client-Side.");
 	
 	var _uuid = nw_instance_get_uuid(instanceIndex);
-	assert_is_not_undefined(_uuid);
-	
 	var _replyTo = getUuid();
-	assert_is_not_undefined(nw_get_sender(_uuid));
 
 	instanceIndex.nwRpc.AddWaiter(_replyTo, fnCallback);
 	
@@ -198,31 +223,6 @@ function rpcSenderBroadcast(instanceIndex, fnName, fnArgs, fnCallback) {
 	if(!is_undefined(fnCallback)) {
 		fnCallback();
 	}
-}
-
-/// @deprecated
-function callInstanceRpcFunction(instanceUuid, fnName, fnArgs, isFirstCall, callback) {
-	var existing = nw_get_instance(instanceUuid);
-	
-	assert_is_not_undefined(existing);
-	
-	return existing.nwRpc.Call(fnName, fnArgs, isFirstCall, callback);
-}
-/// @deprecated
-function registerInstanceRpcFunction(instanceUuid, name, fnCall, _opts) {	
-	var instance = nw_get_instance(instanceUuid);
-	
-	assert_is_not_undefined(instance);
-	
-	if (!variable_instance_exists(instance, "nwUuid")) {
-		throw "The instance must be a sender or a receiver";	
-	}
-	
-	if (!variable_instance_exists(instance, "nwRpc")) {
-		instance.nwRpc = new nw_RpcFunctionsManager(instance);
-	}
-	
-	instance.nwRpc.Register(name, fnCall, _opts);
 }
 
 function cleanUpNetworkManager() {
@@ -382,7 +382,6 @@ function _manageSocketServerEvent(asyncLoad) {
 
 function _manageSocketClientEvent(asyncLoad) {
 	var eventType = ds_map_find_value(asyncLoad, "type");
-	// var eventSocket = ds_map_find_value(asyncLoad, "socket");
 
 	switch(eventType) {
 		case network_type_data:	{
@@ -393,10 +392,6 @@ function _manageSocketClientEvent(asyncLoad) {
 		break;
 		case network_type_disconnect: {
 			self.evCallWithArgs(EV_SOCKET_DISCONNECT, {});
-			
-			//	TODO	Remove this
-			show_message("Servidor desconectado!");
-			game_end();
 		}
 		break;
 	}
@@ -420,12 +415,18 @@ function _nwClientProcessPackage(pck) {
 	else if (pck.id == NwMessageType.rpcSenderBroadcastCall) {
 		_rpcMgr.BroadcastCall(pck.data);
 	}
+	else if (pck.id == NwMessageType.rpcSenderFunctionReply) {
+		_rpcMgr.ReceiveReply(pck.data);
+	}
+	/// @deprecated
 	else if (pck.id == NwMessageType.rpcCall) {
 		_rpcMgr.ProcessRpcCallAsClient(pck, socket);
 	}
+	/// @deprecated
 	else if (pck.id == NwMessageType.rpcCallReplicate) {
 		throw "Invalid package ID.";
 	}
+	/// @deprecated
 	else if (pck.id == NwMessageType.rpcCallExecute) {
 		_rpcMgr.ProcessRpcCallExecuteAsClient(pck, socket);
 	}
@@ -457,12 +458,23 @@ function _onReceiveServerPacket(buffer, socket) {
 		_rpcMgr.BroadcastCall(pck.data);
 		_rpcMgr.BroadcastReplicate(pck.data, socket);
 	}
+	else if (pck.id == NwMessageType.rpcReceiverFunctionCall) {
+	}
+	else if (pck.id == NwMessageType.rpcReceiverFunctionReply) {
+	}
+	else if (pck.id == NwMessageType.rpcSenderFunctionCall) {
+		//	Sender (client) calls to receiver (server)
+		_rpcMgr.SenderCallToReceiver(pck.data, socket);
+	}
+	/// @deprecated
 	else if (pck.id == NwMessageType.rpcCall) {
 		_rpcMgr.ProcessRpcCallAsServer(pck, socket);
 	}
+	/// @deprecated
 	else if (pck.id == NwMessageType.rpcCallReplicate) {
 		_rpcMgr.ProcessRpcCallReplicateAsServer(pck, socket);
 	}
+	/// @deprecated
 	else if (pck.id == NwMessageType.rpcCallExecute) {
 		_rpcMgr.ProcessRpcCallExecuteAsServer(pck, socket);
 	}

@@ -19,7 +19,11 @@ enum NwMessageType {
 	//	Client-sender to Server-receiver
 	rpcSenderFunctionCall,
 	//	Server-receiver replies to Client-Sender
-	rpcSenderFunctionReply
+	rpcSenderFunctionReply,
+	//	Receiver to sender
+	rpcReceiverFunctionCall,
+	//	Sender replies to receiver
+	rpcReceiverFunctionReply
 }
 
 enum SmoothType {

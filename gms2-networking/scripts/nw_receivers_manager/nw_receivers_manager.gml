@@ -87,7 +87,7 @@ function nw_ReceiversManager() constructor {
 				instance = instance_create_layer(-100, -100, currentLayer, objectIdx);
 			}
 			
-			CreateAndAttachReceiverToInstance(info, instance);
+			CreateAndAttachReceiverToInstance(info, instance, socketOwnerOfSender);
 		}
 		else {
 			existing.dirty = true;
@@ -115,7 +115,7 @@ function nw_ReceiversManager() constructor {
 		}
 	};
 	
-	static CreateAndAttachReceiverToInstance = function(info, instance) {
+	static CreateAndAttachReceiverToInstance = function(info, instance, socketOwnerOfSender) {
 		if (variable_instance_exists(instance, "nwInfo")) {
 			return false;	
 		}

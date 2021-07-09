@@ -16,6 +16,32 @@ function nw_RpcManager() constructor {
 		nw_broadcast_exclude(NwMessageType.rpcSenderBroadcastReplicate, pck, [socket]);
 	}
 	
+	static SenderCallToReceiver = function(pck, socket) {
+		var instance = nw_get_instance(pck.id);			
+		if (!is_undefined(instance) && instance_exists(instance)) {
+			var response = new nw_RPCResponse();
+			try {
+				var result = instance.nwRpc.CallFunction(pck.fn, pck.args);
+				response.SetData(result);
+			}
+			catch(err) {
+				response.SetError(err);
+			}
+			
+			response.ReplyTo(pck.replyTo);
+			
+			global.nwNetworkManager.nwCustomSend(socket, NwMessageType.rpcReceiverFunctionReply, response.Serialize());
+		}
+	}
+	
+	static ReceiveReply = function(pck) {
+		var instance = nw_get_instance(pck.id);			
+		if (!is_undefined(instance) && instance_exists(instance)) {
+			var waiterId = pck.replyTo;
+			
+			instance.nwRpc.ProcessReply(waiterId, pck.data);
+		}
+	}
 	
 	///	@deprecated
 	static ProcessRpcCallAsServer = function(pck, socket) {

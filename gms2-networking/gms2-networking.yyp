@@ -37,6 +37,7 @@
     {"id":{"name":"nw_rpc_executor_factory","path":"scripts/nw_rpc_executor_factory/nw_rpc_executor_factory.yy",},"order":1,},
     {"id":{"name":"list_extension","path":"scripts/list_extension/list_extension.yy",},"order":1,},
     {"id":{"name":"nw_engine_base","path":"scripts/nw_engine_base/nw_engine_base.yy",},"order":0,},
+    {"id":{"name":"rpc_counter_example_o","path":"objects/rpc_counter_example_o/rpc_counter_example_o.yy",},"order":2,},
     {"id":{"name":"nw_public_validators_api","path":"scripts/nw_public_validators_api/nw_public_validators_api.yy",},"order":2,},
     {"id":{"name":"readme","path":"notes/readme/readme.yy",},"order":0,},
     {"id":{"name":"nw_rpc_executor_sender","path":"scripts/nw_rpc_executor_sender/nw_rpc_executor_sender.yy",},"order":4,},

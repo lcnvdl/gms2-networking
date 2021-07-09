@@ -77,10 +77,26 @@ function nw_sender_exists(instanceUuid) {
 
 /// @function nw_instance_get_uuid(instance)
 /// @description Gets the UUID of a Network Instance.
-/// @param {instance} instance - Instance ID.
+/// @param {real} instance - Instance ID.
 /// @return {string} UUID.
 function nw_instance_get_uuid(instance) {
 	return instance.nwUuid;	
+}
+
+/// @function nw_instance_is_sender(instance)
+/// @description Checks if the instance is a sender.
+/// @param {real} instance - Instance ID.
+/// @return {bool} True if it's a sender.
+function nw_instance_is_sender(instance) {
+	return variable_instance_exists(instance, "nwUuid") && nw_sender_exists(instance.nwUuid);
+}
+
+/// @function nw_instance_is_receiver(instance)
+/// @description Checks if the instance is a receiver.
+/// @param {real} instance - Instance ID.
+/// @return {bool} True if it's a receiver.
+function nw_instance_is_receiver(instance) {
+	return variable_instance_exists(instance, "nwUuid") && !nw_sender_exists(instance.nwUuid);
 }
 
 /// @function nw_get_instance(instanceUuid)
@@ -101,3 +117,26 @@ function nw_get_instance(instanceUuid) {
 	
 	return existing;
 }
+
+/// @function nw_get_receiver(instanceUuid)
+/// @description Gets a specific receiver.
+/// @param {string} instanceUuid - Instance UUID.
+/// @return {Receiver|undefined} Receiver.
+function nw_get_receiver(instanceUuid) {
+	var instance = nw_get_instance(instanceUuid);
+	if(is_undefined(instance)) {
+		return undefined;	
+	}
+	
+	return instance.nwInfo;
+}
+
+/// @function nw_get_receiver(instanceUuid)
+/// @description Gets a specific receiver.
+/// @param {real} instance - Instance index.
+/// @return {Receiver|undefined} Receiver.
+function nw_instance_get_receiver(instance) {
+	assert_is_not_undefined(instance);
+	return instance.nwInfo;
+}
+

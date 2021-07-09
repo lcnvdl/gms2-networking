@@ -1,8 +1,10 @@
 currentOsVersion = undefined; 
 
 if(nw_is_server()) {
+	//	Sender
 	var sender = nw_add_empty_sender(id, "rpc_example");
 	
+	//	RPC for Receiver Call
 	var rpcGetServerInfo = function() {
 		return {
 			osType: os_type,
@@ -14,6 +16,7 @@ if(nw_is_server()) {
 	
 	nw_rpc_register("getServerInfo", rpcGetServerInfo);
 	
+	//	Broadcast Call
 	sendBroadcast = function() {
 		nw_rpc_sender_broadcast("showMessage", { msg: "Hello world!" }, function() {
 			show_debug_message("Broadcast sent");	
@@ -21,8 +24,10 @@ if(nw_is_server()) {
 	};
 }
 else {
+	//	Receiver
 	nw_singleton_receiver(id, "rpc_example");
 	
+	//	RPC for broadcast
 	nw_rpc_register("showMessage", function(args) {
 		show_message(args.msg);
 	});
@@ -35,6 +40,7 @@ getServerInfoCallback = function(response) {
 	}
 };
 
+//	Receiver call (or self-call if it's called from the server)
 getServerInfo = function() {
 	if(nw_is_server()) {
 		nw_rpc_self_call("getServerInfo", {}, getServerInfoCallback);

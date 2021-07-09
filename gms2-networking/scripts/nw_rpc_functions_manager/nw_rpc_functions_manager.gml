@@ -22,6 +22,17 @@ function nw_RpcFunctionsManager(_instance) constructor {
 		return result;
 	};
 	
+	static ProcessReply = function(waiterId, reply) {
+		var waiter = rpcWaiters[$ waiterId];
+		
+		if (waiter.ttl > 0) {
+			waiter.fnCallback(reply);
+			waiter.ttl = 0;
+		}
+		
+		// variable_struct_remove(rpcWaiters, waiterId);
+	}
+	
 	static AddWaiter = function(waiterId, fnCallback) {
 		rpcWaiters[$ waiterId] = {
 			id: waiterId,
