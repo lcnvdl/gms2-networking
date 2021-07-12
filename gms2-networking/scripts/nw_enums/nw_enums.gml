@@ -4,14 +4,6 @@ enum NwMessageType {
 	syncObjectDelete,
 	syncClientLocation,
 	syncPackage,
-	///	@deprecated
-	rpcCall,
-	///	@deprecated
-	rpcCallExecute,
-	///	@deprecated
-	rpcCallReplicate,
-	///	@deprecated
-	rpcCallReply,
 	//	Server-sender to Client-receivers
 	rpcSenderBroadcastCall,
 	//	Client-sender to Server-Receiver (then Client-receivers)
@@ -22,6 +14,8 @@ enum NwMessageType {
 	rpcSenderFunctionReply,
 	//	Receiver to sender
 	rpcReceiverFunctionCall,
+	//	Receiver to (server-receiver) to Sender
+	rpcReceiverFunctionCallFindSender,
 	//	Sender replies to receiver
 	rpcReceiverFunctionReply
 }

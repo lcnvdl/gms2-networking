@@ -33,9 +33,8 @@ else {
 	});
 }
 
-getServerInfoCallback = function(response) {
-	if (!is_undefined(response) && response.isValid) {
-		var data = response.data;
+getServerInfoCallback = function(data, isValid) {
+	if (isValid) {
 		rpc_example_o.currentOsVersion = data;
 	}
 };

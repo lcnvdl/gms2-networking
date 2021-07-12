@@ -163,7 +163,9 @@ function rpcSelfCall(instanceIndex, fnName, fnArgs, fnCallback) {
 	var response = new nw_RPCResponse();
 	response.SetData(result);
 	
-	fnCallback(response.Serialize());
+	var pck = response.Serialize();
+	
+	fnCallback(pck.data, pck.isValid, pck);
 }
 
 function rpcReceiverCall(instanceIndex, fnName, fnArgs, fnCallback) {
@@ -412,23 +414,17 @@ function _nwClientProcessPackage(pck) {
 	}
 	else if (pck.id == NwMessageType.syncObjectCreate) {
 	}
+	else if (pck.id == NwMessageType.rpcReceiverFunctionCallFindSender) {
+		_rpcMgr.FindSenderAndReply(pck.data);
+	}
 	else if (pck.id == NwMessageType.rpcSenderBroadcastCall) {
 		_rpcMgr.BroadcastCall(pck.data);
 	}
 	else if (pck.id == NwMessageType.rpcSenderFunctionReply) {
 		_rpcMgr.ReceiveReply(pck.data);
 	}
-	/// @deprecated
-	else if (pck.id == NwMessageType.rpcCall) {
-		_rpcMgr.ProcessRpcCallAsClient(pck, socket);
-	}
-	/// @deprecated
-	else if (pck.id == NwMessageType.rpcCallReplicate) {
-		throw "Invalid package ID.";
-	}
-	/// @deprecated
-	else if (pck.id == NwMessageType.rpcCallExecute) {
-		_rpcMgr.ProcessRpcCallExecuteAsClient(pck, socket);
+	else if (pck.id == NwMessageType.rpcReceiverFunctionReply) {
+		_rpcMgr.ReceiveReply(pck.data);
 	}
 	else if (pck.id == NwMessageType.syncObjectDelete) {
 		_receiversMgr.DestroyAndDelete(pck.data.uuid);
@@ -459,24 +455,15 @@ function _onReceiveServerPacket(buffer, socket) {
 		_rpcMgr.BroadcastReplicate(pck.data, socket);
 	}
 	else if (pck.id == NwMessageType.rpcReceiverFunctionCall) {
+		//	Receiver (client or server) calls to Sender (server or client)
+		_rpcMgr.ReceiverCallToSender(pck.data, socket);
 	}
 	else if (pck.id == NwMessageType.rpcReceiverFunctionReply) {
+		_rpcMgr.ReceiveReply(pck.data);
 	}
 	else if (pck.id == NwMessageType.rpcSenderFunctionCall) {
 		//	Sender (client) calls to receiver (server)
 		_rpcMgr.SenderCallToReceiver(pck.data, socket);
-	}
-	/// @deprecated
-	else if (pck.id == NwMessageType.rpcCall) {
-		_rpcMgr.ProcessRpcCallAsServer(pck, socket);
-	}
-	/// @deprecated
-	else if (pck.id == NwMessageType.rpcCallReplicate) {
-		_rpcMgr.ProcessRpcCallReplicateAsServer(pck, socket);
-	}
-	/// @deprecated
-	else if (pck.id == NwMessageType.rpcCallExecute) {
-		_rpcMgr.ProcessRpcCallExecuteAsServer(pck, socket);
 	}
 	else if (pck.id == NwMessageType.syncClientLocation) {
 		var data = _clientsMgr.GetInfo(socket);

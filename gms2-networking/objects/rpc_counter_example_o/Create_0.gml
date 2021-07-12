@@ -32,9 +32,9 @@ if(nw_is_server()) {
 	}
 }
 
-increaseCounterCallback = function(response) {
-	if (response.isValid) {
-		counter = response.data;	
+increaseCounterCallback = function(data, isValid) {
+	if (isValid) {
+		counter = data;	
 	}
 	isLoading = false;
 };
