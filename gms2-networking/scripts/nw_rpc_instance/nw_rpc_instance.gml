@@ -1,10 +1,10 @@
 /**
-* @file RPC Functions Manager.
+* @file RPC Instance.
 * @author Forja Games <forjagames.com@gmail.com>
 * @license MIT
 */
 
-function nw_RpcFunctionsManager(_instance) constructor {
+function nw_RpcInstance(_instance) constructor {
 	rpcFunctions = {};
 	rpcWaiters = {};
 	instance = _instance;

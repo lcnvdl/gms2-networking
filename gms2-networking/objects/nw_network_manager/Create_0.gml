@@ -144,7 +144,7 @@ function nwSend(_socket, _name, _data) {
 
 function rpcInitialize(instanceIndex) {
 	if (!variable_instance_exists(instanceIndex, "nwRpc")) {
-		instanceIndex.nwRpc = new nw_RpcFunctionsManager(instanceIndex);
+		instanceIndex.nwRpc = new nw_RpcInstance(instanceIndex);
 	}
 }
 
@@ -171,7 +171,7 @@ function rpcSelfCall(instanceIndex, fnName, fnArgs, fnCallback) {
 function rpcReceiverCall(instanceIndex, fnName, fnArgs, fnCallback) {
 	_validateRpcArgs(instanceIndex, fnName);
 	
-	assert_is_true(nw_instance_is_receiver(instanceIndex));
+	nw_assert_is_receiver(instanceIndex);
 	
 	var _uuid = nw_instance_get_uuid(instanceIndex);
 	var _replyTo = getUuid();
@@ -185,7 +185,6 @@ function rpcReceiverCall(instanceIndex, fnName, fnArgs, fnCallback) {
 		nwCustomSend(receiverSocket, NwMessageType.rpcReceiverFunctionCall, { id: _uuid, fn: fnName, args: fnArgs, replyTo: _replyTo });
 	}
 	else {
-		//	TODO: The server must find the sender
 		nwCustomSend(nw_get_socket(), NwMessageType.rpcReceiverFunctionCall, { id: _uuid, fn: fnName, args: fnArgs, replyTo: _replyTo });
 	}
 }
@@ -193,7 +192,7 @@ function rpcReceiverCall(instanceIndex, fnName, fnArgs, fnCallback) {
 function rpcSenderCall(instanceIndex, fnName, fnArgs, fnCallback) {
 	_validateRpcArgs(instanceIndex, fnName);
 	
-	assert_is_true(nw_instance_is_sender(instanceIndex));
+	nw_assert_is_sender(instanceIndex);
 	assert_is_true(nw_is_client(), "The RPC from senders can only be called in Client-Side.");
 	
 	var _uuid = nw_instance_get_uuid(instanceIndex);
@@ -205,8 +204,8 @@ function rpcSenderCall(instanceIndex, fnName, fnArgs, fnCallback) {
 }
 
 function _validateRpcArgs(instanceIndex, fnName) {
-	assert_is_not_undefined(instanceIndex);
-	assert_is_string(fnName);	
+	assert_is_not_undefined(instanceIndex, "The instance index must be defined");
+	assert_is_string(fnName, "The function name must be a string");
 }
 
 function rpcSenderBroadcast(instanceIndex, fnName, fnArgs, fnCallback) {

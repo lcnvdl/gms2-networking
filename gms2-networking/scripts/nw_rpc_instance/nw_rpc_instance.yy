@@ -6,7 +6,7 @@
     "path": "folders/Scripts/Gms2_Networking/AutoMagic_System/Rpc.yy",
   },
   "resourceVersion": "1.0",
-  "name": "nw_rpc_functions_manager",
+  "name": "nw_rpc_instance",
   "tags": [],
   "resourceType": "GMScript",
 }
