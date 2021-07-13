@@ -1,14 +1,16 @@
-function nw_RpcFunction(_name, _fnCall, _opts) constructor {
+/**
+* @file RPC Function.
+* @author Forja Games <forjagames.com@gmail.com>
+* @license MIT
+*/
+
+function nw_RpcFunction(_instance, _name, _fnCall) constructor {
 	name = _name;
 	fnCall = _fnCall;
-	opts = _opts;
-	/// @desc Who can call the function
-	allowance = !is_undefined(_opts) ? _opts.allowance : RpcFunctionCallerAllowance.Everyone;
-	/// @desc Who will run the function
-	executors = !is_undefined(_opts) ? _opts.executors : [RpcFunctionExecutor.Everyone];
+	instance = _instance;
 	
 	static Call = function(_args) {
-		fnCall(_args);	
+		return fnCall(_args);
 	};
 }
 

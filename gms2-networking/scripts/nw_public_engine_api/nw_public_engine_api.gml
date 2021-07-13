@@ -72,6 +72,8 @@ function nw_get_socket() {
 
 /// @function nw_subscribe_connect(callbackFunction, eventArgs)
 /// @description Subscribes to the connection event. It is called every time the server receives a new connection.
+/// @param {function} callbackFunction - Callback.
+/// @param {*} eventArgs - Event args.
 /// @return {real} Subscription index.
 function nw_subscribe_connect(callbackFunction, eventArgs) {
 	var sid = global.nwNetworkManager.evSubscribe(EV_SOCKET_CONNECT, callbackFunction, eventArgs);
@@ -80,6 +82,8 @@ function nw_subscribe_connect(callbackFunction, eventArgs) {
 
 /// @function nw_subscribe_connect(callbackFunction, eventArgs)
 /// @description Subscribes to the disconnection event. It is called every time a client disconnects from the server.
+/// @param {function} callbackFunction - Callback.
+/// @param {*} eventArgs - Event args.
 /// @return {real} Subscription index.
 function nw_subscribe_disconnect(callbackFunction, eventArgs) {
 	var sid = global.nwNetworkManager.evSubscribe(EV_SOCKET_DISCONNECT, callbackFunction, eventArgs);
@@ -97,4 +101,11 @@ function nw_subscription_destroy(subscriptionIndex) {
 /// @description Destroy all the sockets and the network manager.
 function nw_clean_up() {
 	global.nwNetworkManager.cleanUpNetworkManager();
+}
+
+/// @function nw_get_dt()
+/// @description Returns the delta time.
+/// @return {real} Delta time (in seconds).
+function nw_get_dt() {
+	return global.nwNetworkManager._dt;	
 }

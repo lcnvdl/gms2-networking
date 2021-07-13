@@ -25,14 +25,15 @@
   ],
   "properties": [],
   "overriddenProperties": [
-    {"propertyId":{"name":"waiting_mode_description","path":"objects/nw_network_base_demo/nw_network_base_demo.yy",},"objectId":{"name":"nw_network_base_demo","path":"objects/nw_network_base_demo/nw_network_base_demo.yy",},"value":"Example 3 - Chat Example\\nWaiting for connection. C = Server, B = Client.","resourceVersion":"1.0","name":"","tags":[],"resourceType":"GMOverriddenProperty",},
+    {"propertyId":{"name":"server_mode_description","path":"objects/nw_network_base_demo/nw_network_base_demo.yy",},"objectId":{"name":"nw_network_base_demo","path":"objects/nw_network_base_demo/nw_network_base_demo.yy",},"value":"Server Mode - RPC Demo","resourceVersion":"1.0","name":"","tags":[],"resourceType":"GMOverriddenProperty",},
+    {"propertyId":{"name":"waiting_mode_description","path":"objects/nw_network_base_demo/nw_network_base_demo.yy",},"objectId":{"name":"nw_network_base_demo","path":"objects/nw_network_base_demo/nw_network_base_demo.yy",},"value":"Example 5\\nWaiting for connection. C = Server, B = Client.","resourceVersion":"1.0","name":"","tags":[],"resourceType":"GMOverriddenProperty",},
   ],
   "parent": {
-    "name": "Example_3",
-    "path": "folders/Objects/Gms2_Networking_Examples/Example_3.yy",
+    "name": "Example_5",
+    "path": "folders/Objects/Gms2_Networking_Examples/Example_5.yy",
   },
   "resourceVersion": "1.0",
-  "name": "nw_network_demo3_o",
+  "name": "nw_network_demo5_o",
   "tags": [],
   "resourceType": "GMObject",
 }

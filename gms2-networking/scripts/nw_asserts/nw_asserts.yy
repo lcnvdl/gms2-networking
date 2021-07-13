@@ -2,11 +2,11 @@
   "isDnD": false,
   "isCompatibility": false,
   "parent": {
-    "name": "Rpc",
-    "path": "folders/Scripts/Gms2_Networking/AutoMagic_System/Rpc.yy",
+    "name": "API",
+    "path": "folders/Scripts/Gms2_Networking/API.yy",
   },
   "resourceVersion": "1.0",
-  "name": "nw_rpc_functions_manager",
+  "name": "nw_asserts",
   "tags": [],
   "resourceType": "GMScript",
 }

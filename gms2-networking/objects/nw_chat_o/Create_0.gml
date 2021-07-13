@@ -4,18 +4,16 @@ chatText = "";
 subscription = -1;
 
 if(nw_is_server()) {
-	subscription = nw_subscribe_receive("chat", function(__subscriptionArgs, _data) {
-		//	BUG: data.data.data ???? 
-		var msg = _data.data.data.data.msg;
+	subscription = nw_subscribe_receive("chat", function(__subscriptionArgs, _package) {
+		var msg = _package.data.msg;
 		ds_list_add(chat, msg);
 		nw_broadcast("on-chat", { msg: msg });
 		generateChatText();
 	}, undefined);
 }
 else {
-	subscription = nw_subscribe_receive("on-chat", function(__subscriptionArgs, _data) {
-		//	BUG: data.data.data ???? 
-		var msg = _data.data.data.data.msg;
+	subscription = nw_subscribe_receive("on-chat", function(__subscriptionArgs, _package) {
+		var msg = _package.data.msg;
 		ds_list_add(chat, msg);
 		generateChatText();
 	}, undefined);

@@ -52,6 +52,19 @@ function nw_broadcast(eventName, data) {
 	return true;
 }
 
+/// @function nw_broadcast_exclude(eventName, data, socket)
+/// @description Sends an event with a struct to all connected sockets. This can run only in server mode.
+///	@param {string} eventName - Name that identifies the event.
+///	@param {struct} data - Struct to send.
+///	@param {array} exclude - List of sockets to exclude.
+///	@return {boolean} True 
+function nw_broadcast_exclude(eventName, data, exclude) {
+	assert_is_string(eventName);
+	assert_is_true(nw_is_server());
+	global.nwNetworkManager.nwSendBroadcastExclude(eventName, data, exclude);
+	return true;
+}
+
 /// @function nw_subscribe_receive(eventName, eventCallback, _args)
 ///	@description Register a new handler for the given event.
 ///	@param {string} eventName - Name that identifies the event.

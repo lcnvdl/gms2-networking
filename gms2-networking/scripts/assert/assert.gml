@@ -1,11 +1,11 @@
-/// @function assert_equals(value, expected, message*);
+/// @function assert_equals(value, expected, message*)
 function assert_equals() {
-	var current = argument0;
-	var expected = argument1;
+	var current = argument[0];
+	var expected = argument[1];
 	var msg;
 	
 	if (argument_count == 3) {
-		msg = argument2;	
+		msg = argument[2];
 	}
 	else {
 		msg = "Equals assertion failed.";
@@ -16,7 +16,7 @@ function assert_equals() {
 	}
 }
 
-/// @function assert_not_equals(value, expected, message*);
+/// @function assert_not_equals(value, expected, message*)
 function assert_not_equals() {
 	var current = argument0;
 	var expected = argument1;
@@ -34,7 +34,7 @@ function assert_not_equals() {
 	}
 }
 
-/// @function assert_is_true(value, message*);
+/// @function assert_is_true(value, message*)
 function assert_is_true() {
 	var current = argument0;
 	var msg;
@@ -51,7 +51,7 @@ function assert_is_true() {
 	}
 }
 
-/// @function assert_is_false(value, message*);
+/// @function assert_is_false(value, message*)
 function assert_is_false() {
 	var current = argument0;
 	var msg;
@@ -68,7 +68,7 @@ function assert_is_false() {
 	}
 }
 
-/// @function assert_is_false(value, message*);
+/// @function assert_is_false(value, message*)
 function assert_is_not_undefined() {
 	var current = argument0;
 	var msg;
@@ -85,7 +85,7 @@ function assert_is_not_undefined() {
 	}
 }
 
-/// @function assert_is_false(value, message*);
+/// @function assert_is_false(value, message*)
 function assert_is_undefined() {
 	var current = argument0;
 	var msg;
@@ -102,7 +102,7 @@ function assert_is_undefined() {
 	}
 }
 
-/// @function assert_is_string(value, message*);
+/// @function assert_is_string(value, message*)
 function assert_is_string() {
 	var current = argument0;
 	var msg;
@@ -119,7 +119,7 @@ function assert_is_string() {
 	}
 }
 
-/// @function assert_is_number(value, message*);
+/// @function assert_is_number(value, message*)
 function assert_is_number() {
 	var current = argument0;
 	var msg;
@@ -136,7 +136,7 @@ function assert_is_number() {
 	}
 }
 
-/// @function assert_is_array(value, message*);
+/// @function assert_is_array(value, message*)
 function assert_is_array() {
 	var current = argument0;
 	var msg;
@@ -153,7 +153,7 @@ function assert_is_array() {
 	}
 }
 
-/// @function assert_is_struct(value, message*);
+/// @function assert_is_struct(value, message*)
 function assert_is_struct() {
 	var current = argument0;
 	var msg;
