@@ -22,7 +22,7 @@ function nw_send(eventName, data) {
 ///	@return {boolean} True 
 function nw_send_to(socket, eventName, data) {
 	assert_is_not_undefined(socket);
-	assert_is_string(eventName);
+	assert_is_string(eventName, "nw_send_to: invalid parameter 'eventName'");
 	global.nwNetworkManager.nwSend(socket, eventName, data);
 	return true;
 }
@@ -35,7 +35,7 @@ function nw_send_to(socket, eventName, data) {
 ///	@return {boolean} True 
 function nw_custom_send_to(socket, eventName, data) {
 	assert_is_not_undefined(socket);
-	assert_is_string(eventName);
+	assert_is_string(eventName, "nw_custom_send_to: invalid parameter 'eventName'");
 	global.nwNetworkManager.nwCustomSend(socket, eventName, data);
 	return true;
 }
@@ -46,7 +46,7 @@ function nw_custom_send_to(socket, eventName, data) {
 ///	@param {struct} data - Struct to send.
 ///	@return {boolean} True 
 function nw_broadcast(eventName, data) {
-	assert_is_string(eventName);
+	assert_is_string(eventName, "nw_broadcast: invalid parameter 'eventName'");
 	assert_is_true(nw_is_server());
 	global.nwNetworkManager.nwSendBroadcast(eventName, data);
 	return true;
@@ -59,7 +59,7 @@ function nw_broadcast(eventName, data) {
 ///	@param {array} exclude - List of sockets to exclude.
 ///	@return {boolean} True 
 function nw_broadcast_exclude(eventName, data, exclude) {
-	assert_is_string(eventName);
+	assert_is_string(eventName, "nw_broadcast_exclude: invalid parameter 'eventName'");
 	assert_is_true(nw_is_server());
 	global.nwNetworkManager.nwSendBroadcastExclude(eventName, data, exclude);
 	return true;
@@ -72,7 +72,7 @@ function nw_broadcast_exclude(eventName, data, exclude) {
 ///	@param {*} _args - Extra information included in the callback.
 ///	@return {real} Subscription identifier. 
 function nw_subscribe_receive(eventName, eventCallback, _args) {
-	assert_is_string(eventName);
+	assert_is_string(eventName, "nw_subscribe_receive: invalid parameter 'eventName'");
 	var sid = global.nwNetworkManager.evSubscribe("recv-" + eventName, eventCallback, _args);
 	return sid;
 }

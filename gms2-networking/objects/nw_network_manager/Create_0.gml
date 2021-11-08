@@ -98,7 +98,7 @@ function nwRegisterObjectAsSyncSender(instance, _uuid, _opts) {
 
 function nwSendBroadcastExclude(_name, _data, exclude) {
 	assert_is_not_undefined(_data);
-	assert_is_string(_name);
+	assert_is_string(_name, "nwSendBroadcastExclude: invalid parameter 'name'");
 	assert_is_array(exclude);
 	
 	var _package = {
@@ -111,7 +111,7 @@ function nwSendBroadcastExclude(_name, _data, exclude) {
 
 function nwSendBroadcast(_name, _data) {
 	assert_is_not_undefined(_data);
-	assert_is_string(_name);
+	assert_is_string(_name, "nwSendBroadcast: invalid parameter 'name'");
 	
 	var _package = {
 		name: _name,
@@ -132,7 +132,7 @@ function nwCustomSend(_socket, _type, _data) {
 function nwSend(_socket, _name, _data) {
 	assert_is_not_undefined(_socket);
 	assert_is_not_undefined(_data);
-	assert_is_string(_name);
+	assert_is_string(_name, "nwSend: invalid parameter 'name'");
 	
 	var _package = {
 		name: _name,
@@ -174,6 +174,7 @@ function rpcReceiverCall(instanceIndex, fnName, fnArgs, fnCallback) {
 	nw_assert_is_receiver(instanceIndex);
 	
 	var _uuid = nw_instance_get_uuid(instanceIndex);
+
 	randomize();
 	var _replyTo = getUuid();
 
@@ -197,7 +198,7 @@ function rpcSenderCall(instanceIndex, fnName, fnArgs, fnCallback) {
 	assert_is_true(nw_is_client(), "The RPC from senders can only be called in Client-Side.");
 	
 	var _uuid = nw_instance_get_uuid(instanceIndex);
-	
+
 	randomize();
 	var _replyTo = getUuid();
 
