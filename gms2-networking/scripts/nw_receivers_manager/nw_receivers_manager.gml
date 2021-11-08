@@ -149,7 +149,7 @@ function nw_ReceiversManager() constructor {
 				value: _value
 			}));
 				
-			if (is_undefined(_value)) {
+			if (is_undefined(_value) || is_ptr(_value)) {
 				show_debug_message(varName + " ignored creating a new receiver - empty initial value");
 			}
 			else {

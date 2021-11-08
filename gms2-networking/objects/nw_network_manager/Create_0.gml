@@ -174,6 +174,7 @@ function rpcReceiverCall(instanceIndex, fnName, fnArgs, fnCallback) {
 	nw_assert_is_receiver(instanceIndex);
 	
 	var _uuid = nw_instance_get_uuid(instanceIndex);
+	randomize();
 	var _replyTo = getUuid();
 
 	instanceIndex.nwRpc.AddWaiter(_replyTo, fnCallback);
@@ -196,6 +197,8 @@ function rpcSenderCall(instanceIndex, fnName, fnArgs, fnCallback) {
 	assert_is_true(nw_is_client(), "The RPC from senders can only be called in Client-Side.");
 	
 	var _uuid = nw_instance_get_uuid(instanceIndex);
+	
+	randomize();
 	var _replyTo = getUuid();
 
 	instanceIndex.nwRpc.AddWaiter(_replyTo, fnCallback);

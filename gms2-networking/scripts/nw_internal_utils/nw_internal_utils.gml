@@ -1,5 +1,5 @@
 function _nw_smooth_update_entity(syncVar, _instance) {
-	if(!is_undefined(syncVar.value)) {
+	if(!is_undefined(syncVar.value) && !is_ptr(syncVar.value)) {
 		var _dt = global.nwNetworkManager._dt;
 		var _syncDelay = global.nwNetworkManager.syncDelay
 		var factor = _dt*2;
