@@ -75,6 +75,7 @@
     {"name":"HTML5","path":"options/html5/options_html5.yy",},
     {"name":"iOS","path":"options/ios/options_ios.yy",},
     {"name":"tvOS","path":"options/tvos/options_tvos.yy",},
+    {"name":"operagx","path":"options/operagx/options_operagx.yy",},
   ],
   "isDnDProject": false,
   "isEcma": false,
@@ -146,7 +147,7 @@
   ],
   "IncludedFiles": [],
   "MetaData": {
-    "IDEVersion": "2.3.2.560",
+    "IDEVersion": "2.3.6.595",
   },
   "resourceVersion": "1.4",
   "name": "gms2-networking",

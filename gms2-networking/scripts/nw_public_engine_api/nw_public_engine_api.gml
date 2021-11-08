@@ -109,3 +109,17 @@ function nw_clean_up() {
 function nw_get_dt() {
 	return global.nwNetworkManager._dt;	
 }
+
+/// @function nw_ensure_engine()
+/// @description Ensures a nw_network_manager instance.
+function nw_ensure_engine() {
+	nwEnsureEngine();
+}
+
+/// @function nw_safe(fn)
+/// @description Runs a function ensuring a nw_network_manager instance.
+/// @param {function} fn - Function to run.
+function nw_safe(fn) {
+	nwEnsureEngine();
+	fn();
+}
