@@ -36,6 +36,7 @@ function smooth_damp(current, target, dampSpeed) {
 function damp_angle(current, target, delta) {
 	var tempdir;
 	var diff = abs(target-current);
+	var angle = current;
 	
 	if (diff > 180)
 	{
