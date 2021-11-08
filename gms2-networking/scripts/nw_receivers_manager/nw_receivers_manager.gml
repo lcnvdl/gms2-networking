@@ -76,7 +76,7 @@ function nw_ReceiversManager() constructor {
 			
 			var instance = undefined;
 			
-			if (existingBrother != noone && objectIdx != nw_empty_object) {
+			if (currentLayer != -1 && objectIdx != nw_empty_object) {
 				var withSameId = -1;
 				var targetUuid = info.uuid;
 				
