@@ -63,8 +63,16 @@ function nw_ReceiversManager() constructor {
 				objectIdx = nw_empty_object;	
 			}
 			
-			var existingBrother = instance_find(objectIdx, 0);
-			var currentLayer = (existingBrother == noone) ? global.nwNetworkManager.layer : existingBrother.layer;
+			var currentLayer = layer_get_id(info.layerName);
+			if (currentLayer == -1) {
+				currentLayer = global.nwNetworkManager.layer;	
+			}
+			if (currentLayer == -1) {
+				var existingBrother = instance_find(objectIdx, 0);
+				if (existingBrother != noone) {
+					currentLayer = existingBrother.layer;
+				}
+			}
 			
 			var instance = undefined;
 			

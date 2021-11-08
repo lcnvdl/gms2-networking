@@ -2,6 +2,7 @@ function nw_Sender() constructor {
 	uuid = "";
 	dirty = false;
 	object = undefined;
+	layerName = undefined;
 	instance = undefined;
 	syncVariables = ds_list_create();
 	
@@ -10,6 +11,7 @@ function nw_Sender() constructor {
 		dirty = true;
 		instance = _instance;
 		object = object_get_name(_instance.object_index);
+		layerName = layer_get_name(_instance.layer);
 	};
 	
 	static Exists = function() {
@@ -201,6 +203,7 @@ function nw_Sender() constructor {
 		var packageToSend = { 
 			uuid: _self.uuid, 
 			object: _self.object,
+			layerName: _self.layerName,
 			syncVariables: reducedSyncVariables,
 			variables: variablesToSend
 		};

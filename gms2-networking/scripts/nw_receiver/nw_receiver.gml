@@ -3,6 +3,7 @@ function nw_Receiver() constructor {
 	dirty = false;
 	object = undefined;
 	instance = undefined;
+	layerName = undefined;
 	syncVariables = ds_list_create();
 	settings = {};
 	
@@ -58,6 +59,7 @@ function nw_Receiver() constructor {
 		uuid = info.uuid;
 		instance = _instance;
 		object = info.object;
+		layerName = info.layerName;
 		dirty = true;
 	};
 	
