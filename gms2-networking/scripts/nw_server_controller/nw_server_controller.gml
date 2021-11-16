@@ -6,7 +6,9 @@ function nw_ServerController() constructor {
 	};
 	
 	static UnregisterValidator = function(objectIndex) {
-		validators[$ objectIndex] = undefined;	
+		if(variable_struct_exists(validators, objectIndex)) {
+			variable_struct_remove(validators, objectIndex);
+		}
 	};
 	
 	static ClearValidators = function() {
@@ -24,5 +26,6 @@ function nw_ServerController() constructor {
 	};
 	
 	static Dispose = function() {
+		validators = pointer_null;
 	};
 }

@@ -8,7 +8,7 @@ function _nw_smooth_update_entity(syncVar, _instance) {
 		}
 				
 		if (syncVar.name == "x") {
-			if(syncVar.value != _instance.x){
+			if(syncVar.value != _instance.x) {
 				_instance.x = damp(_instance.x, syncVar.value, max(1, abs(_instance.x-syncVar.value)*factor));
 			}
 		}

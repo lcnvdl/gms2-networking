@@ -18,6 +18,7 @@ function nw_RpcInstance(_instance) constructor {
 	};
 	
 	static CallFunction = function(fnName, fnArgs) {
+		assert_is_true(variable_struct_exists(rpcFunctions, fnName), "RPC: The function " + fnName + " is not registered");
 		var result = rpcFunctions[$ fnName].Call(fnArgs);
 		return result;
 	};
@@ -49,7 +50,7 @@ function nw_RpcInstance(_instance) constructor {
 			if (waiter.ttl <= 0) {
 				if(!waiter.finished) {
 					var response = new nw_RPCResponse();
-					response.SetError({error: "Timeout"});
+					response.SetError({ error: "Timeout" });
 					waiter.cb(response.data, false, response);
 					waiter.finished = true;	
 				}

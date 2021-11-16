@@ -64,11 +64,11 @@ function nw_Receiver() constructor {
 	};
 	
 	static Exists = function() {
-		return instance_exists(instance);	
+		return !is_undefined(instance) && instance_exists(instance);	
 	};
 	
 	static DestroyInstance = function() {
-		if (instance_exists(instance)) {
+		if (Exists(instance)) {
 			instance_destroy(instance);	
 		}	
 	};
