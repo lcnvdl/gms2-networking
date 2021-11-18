@@ -59,12 +59,16 @@ function nw_ReceiversManager() constructor {
 				"Client Mode: socketOwnerOfSender must be undefined (is only for servers)");
 		}
 		
+		var receiver;
+		
 		if(is_undefined(existing)) {
-			return _CreateNewReceiverFromReceivedMessage(info, socketOwnerOfSender);
+			receiver = _CreateNewReceiverFromReceivedMessage(info, socketOwnerOfSender);
 		}
 		else {
-			return _UpdateExistingReceiverFromMessage(info, socketOwnerOfSender, existing);
+			receiver = _UpdateExistingReceiverFromMessage(info, socketOwnerOfSender, existing);
 		}
+		
+		return receiver;
 	};
 	
 	static _UpdateExistingReceiverFromMessage = function(info, socketOwnerOfSender, existing) {
@@ -79,6 +83,9 @@ function nw_ReceiversManager() constructor {
 			//	Server validators
 			if (nw_is_server() && instance_exists(_existing.instance)) {
 				var svController = global.nwNetworkManager.getServerController();
+				
+				//	TODO	varVal ya está serializado? Si es así, usar syncVar.value está bien, sino usar syncVar.GetValue() y usar .SetRawValue en vez de .SetValue
+				
 				if (!svController.ValidateValue(_existing.instance.object_index, varName, varVal, syncVar.value)) {
 					show_debug_message("New value for " + varName + " rejected by server validator.");
 					return;
@@ -134,14 +141,37 @@ function nw_ReceiversManager() constructor {
 			instance = instance_create_layer(-100, -100, currentLayer, objectIdx);
 		}
 			
-		_CreateAndAttachReceiverToInstance(info, instance, socketOwnerOfSender);
+		var newReceiver = _CreateAndAttachReceiverToInstance(info, instance, socketOwnerOfSender);
 		
-		return instance;
+		return newReceiver;
+	};
+	
+	static _AttachReceiverToInstance_OnlyForTesting = function(receiver, instance) {
+		if (variable_instance_exists(instance, "nwInfo")) {
+			return pointer_null;
+		}
+		
+		receiver.instance = instance;			
+		instance.nwRecv = true;
+		instance.nwUuid = receiver.uuid;
+		instance.nwInfo = receiver;
+		
+		//	Call the event
+		if (variable_instance_exists(instance, "nwOnCreateReceiver")) {
+			instance.nwOnCreateReceiver(receiver);	
+		}
+		
+		//	Add to the receivers list
+		if(!ds_map_exists(receivers, receiver.uuid)) {
+			ds_map_add(receivers, receiver.uuid, receiver);
+		}
+		
+		return receiver;
 	};
 	
 	static _CreateAndAttachReceiverToInstance = function(info, instance, socketOwnerOfSender) {
 		if (variable_instance_exists(instance, "nwInfo")) {
-			return false;	
+			return pointer_null;
 		}
 		
 		var newReceiver = new nw_Receiver();
@@ -169,23 +199,28 @@ function nw_ReceiversManager() constructor {
 				show_debug_message(varName + " ignored creating a new receiver - empty initial value");
 			}
 			else {
-				show_debug_message(varName + " set to " + string(_value));
-					
-				_syncVar.ApplyCustomValue(_instance, _value);
+				var _newValue = _syncVar.GetValue();
+				
+				show_debug_message(varName + " set to " + string(_newValue));
+
+				//	Applies the new value to the instance
+				_syncVar.ApplyCustomValue(_instance, _newValue);
 			}
 		}, { recvInfo: newReceiver, info: info, instance: instance });
 			
 		instance.nwRecv = true;
 		instance.nwUuid = info.uuid;
 		instance.nwInfo = newReceiver;
-			
+		
+		//	Call the event
 		if (variable_instance_exists(instance, "nwOnCreateReceiver")) {
 			instance.nwOnCreateReceiver(newReceiver);	
 		}
 		
+		//	Add to the receivers list
 		ds_map_add(receivers, info.uuid, newReceiver);
 		
-		return true;
+		return newReceiver;
 	};
 	
 	static DestroyAndDelete = function(_uuid) {

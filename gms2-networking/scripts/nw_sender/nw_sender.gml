@@ -94,21 +94,21 @@ function nw_Sender() constructor {
 		if (syncVar.name == "x") {
 			if(syncVar.IsDifferent(this.instance.x)) {
 				syncVar.SetValue(round(this.instance.x));
-				this.instance.x = syncVar.value;
+				this.instance.x = syncVar.GetValue();
 				this.dirty = true;
 			}
 		}
 		else if (syncVar.name == "y") {
 			if(syncVar.IsDifferent(this.instance.y)) {
 				syncVar.SetValue(round(this.instance.y));
-				this.instance.y = syncVar.value;
+				this.instance.y = syncVar.GetValue();
 				this.dirty = true;
 			}
 		}
 		else if (syncVar.name == "image_angle") {
 			if(syncVar.IsDifferent(this.instance.image_angle)) {
 				syncVar.SetValue(round(this.instance.image_angle));
-				this.instance.image_angle = syncVar.value;
+				this.instance.image_angle = syncVar.GetValue();
 				this.dirty = true;
 			}
 		}
@@ -148,19 +148,19 @@ function nw_Sender() constructor {
 		if (syncVar.name == "x") {
 			if(syncVar.IsDifferent(this.instance.x)) {
 				syncVar.SetValue(round(this.instance.x));
-				this.instance.x = syncVar.value;
+				this.instance.x = syncVar.GetValue();
 			}
 		}
 		else if (syncVar.name == "y") {
 			if(syncVar.IsDifferent(this.instance.y)) {
 				syncVar.SetValue(round(this.instance.y));
-				this.instance.y = syncVar.value;
+				this.instance.y = syncVar.GetValue();
 			}
 		}
 		else if (syncVar.name == "image_angle") {
 			if(syncVar.IsDifferent(this.instance.image_angle)) {
 				syncVar.SetValue(round(this.instance.image_angle));
-				this.instance.image_angle = syncVar.value;
+				this.instance.image_angle = syncVar.GetValue();
 			}
 		}
 		else if(syncVar.ValueExists(this.instance)) {

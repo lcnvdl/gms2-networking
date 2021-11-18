@@ -1,5 +1,9 @@
 function _nw_smooth_update_entity(syncVar, _instance) {
-	if(!is_undefined(syncVar.value) && !is_ptr(syncVar.value)) {
+	//	TODO	syncVar.value != x || No debería usar IsDifferent() ??
+	
+	var value = syncVar.GetValue();
+	
+	if(!is_undefined(value) && !is_ptr(value)) {
 		var _dt = global.nwNetworkManager._dt;
 		var _syncDelay = global.nwNetworkManager.syncDelay
 		var factor = _dt*2;
@@ -8,24 +12,24 @@ function _nw_smooth_update_entity(syncVar, _instance) {
 		}
 				
 		if (syncVar.name == "x") {
-			if(syncVar.value != _instance.x) {
-				_instance.x = damp(_instance.x, syncVar.value, max(1, abs(_instance.x-syncVar.value)*factor));
+			if(value != _instance.x) {
+				_instance.x = damp(_instance.x, value, max(1, abs(_instance.x-value)*factor));
 			}
 		}
 		else if (syncVar.name == "y") {
-			if(syncVar.value != _instance.y){
-				_instance.y = damp(_instance.y, syncVar.value, max(1, abs(_instance.y-syncVar.value)*factor));
+			if(value != _instance.y){
+				_instance.y = damp(_instance.y, value, max(1, abs(_instance.y-value)*factor));
 			}
 		}
 		else if (syncVar.name == "image_angle") {
-			if(syncVar.value != _instance.image_angle) {
-				_instance.image_angle = damp_angle(_instance.image_angle, syncVar.value, 360*factor);
+			if(value != _instance.image_angle) {
+				_instance.image_angle = damp_angle(_instance.image_angle, value, 360*factor);
 			}
 		}
 		else if(syncVar.ValueExists(_instance)) {
 			var currentValue = syncVar.ReadValue(_instance);
-			if(currentValue != syncVar.value) {
-				var newValue = syncVar.value;
+			if(currentValue != value) {
+				var newValue = value;
 				
 				if(syncVar.type == SV_INTEGER ||
 					syncVar.type == SV_DECIMAL) {

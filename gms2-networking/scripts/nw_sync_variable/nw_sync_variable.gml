@@ -9,6 +9,7 @@ function cm_SyncVariable(_name, _type) constructor {
 	binding = SyncVarBinding.Regular;
 	_dirty = false;
 	settings = {};
+	serializers = [];
 	
 	_isGlobal = undefined;
 	_realName = undefined;
@@ -28,8 +29,17 @@ function cm_SyncVariable(_name, _type) constructor {
 	};
 	
 	static SetValue = function(v) {
+		value = _InternalSerializeValue(v);
+		_dirty = true;
+	};
+	
+	static SetRawValue = function(v) {
 		value = v;
 		_dirty = true;
+	};
+	
+	static GetValue = function() {
+		return _InternalDeserializeValue(value);	
 	};
 	
 	static ValueExists = function(_instance) {
@@ -51,35 +61,41 @@ function cm_SyncVariable(_name, _type) constructor {
 	};
 	
 	static ApplyValue = function(_instance) {
+		var _value = _InternalDeserializeValue(value);
+		
 		if(_isGlobal) {
-			variable_global_set(_realName, value);
+			variable_global_set(_realName, _value);
 		}
 		else {
-			variable_instance_set(_instance, _realName, value);	
+			variable_instance_set(_instance, _realName, _value);	
 		}
 	};
 	
 	static ReadValue = function(_instance) {
+		var _value;
+		
 		if (_isGlobal) {
-			return variable_global_get(_realName);
+			_value = variable_global_get(_realName);
 		}
 		else {
-			return variable_instance_get(_instance, _realName);
+			_value = variable_instance_get(_instance, _realName);
 		}
+		
+		return _value;
 	};
 	
-	static SetValueFromServer = function(v) {
+	/*static SetValueFromServer = function(v) {
 		assert_equals(binding, SyncVarBinding.TwoWay);
 		
 		value = v;
-	};
+	};*/
 	
-	static SendToServer = function(v) {
+	/*static SendToServer = function(v) {
 		assert_equals(binding, SyncVarBinding.TwoWay);
 		
 		settings[$ "tw_dirty"] = true;
 		return self;
-	};
+	};*/
 	
 	static CanSendValue = function() {
 		if (binding == SyncVarBinding.TwoWay) {
@@ -158,20 +174,50 @@ function cm_SyncVariable(_name, _type) constructor {
 			return true;	
 		}
 		
+		var realWorldValue = _InternalDeserializeValue(value);
+
 		if (IsNumeric()) {
 			var delta = GetDelta();
 			if (delta > 0) {
-				return abs(instanceValue - value) >= delta;
+				return abs(instanceValue - realWorldValue) >= delta;
 			}
 			else if(type == SV_INTEGER) {
-				return round(instanceValue) != round(value);	
+				return round(instanceValue) != round(realWorldValue);	
 			}
 			else {
-				return instanceValue != value;	
+				return instanceValue != realWorldValue;	
 			}
 		}
 		
-		return instanceValue != value;
+		return instanceValue != realWorldValue;
+	};
+	
+	static ClearSerializers = function() {
+		serializers = [];	
+	};
+	
+	static AddSerializer = function(serializer) {
+		array_push(serializers, serializer);	
+	};
+	
+	static _InternalSerializeValue = function(_value) {
+		var finalValue = _value;
+		
+		for(var i = 0; i < array_length(serializers); i++) {
+			finalValue = serializers[i].Serialize(finalValue, self);	
+		}
+		
+		return finalValue;
+	};
+	
+	static _InternalDeserializeValue = function(_value) {
+		var finalValue = _value;
+
+		for(var i = 0; i < array_length(serializers); i++) {
+			finalValue = serializers[i].Deserialize(finalValue, self);	
+		}
+		
+		return finalValue;
 	};
 	
 	static Deserialize = function(data) {

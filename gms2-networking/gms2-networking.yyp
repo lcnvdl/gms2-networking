@@ -53,6 +53,7 @@
     {"id":{"name":"nw_example_3_room","path":"rooms/nw_example_3_room/nw_example_3_room.yy",},"order":2,},
     {"id":{"name":"nw_chat_o","path":"objects/nw_chat_o/nw_chat_o.yy",},"order":2,},
     {"id":{"name":"nw_rpc_instance","path":"scripts/nw_rpc_instance/nw_rpc_instance.yy",},"order":3,},
+    {"id":{"name":"nw_sender_test","path":"scripts/nw_sender_test/nw_sender_test.yy",},"order":5,},
     {"id":{"name":"nw_network_manager","path":"objects/nw_network_manager/nw_network_manager.yy",},"order":0,},
     {"id":{"name":"nw_engine_http2","path":"scripts/nw_engine_http2/nw_engine_http2.yy",},"order":1,},
     {"id":{"name":"nw_example_2_room","path":"rooms/nw_example_2_room/nw_example_2_room.yy",},"order":1,},

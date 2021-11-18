@@ -23,3 +23,30 @@ test_f(nw_sync_variable_test, "nw_sync_variable_test.IsGlobal should work fine",
 	gmltest_expect_false(svText.IsGlobal());
 	gmltest_expect_false(svInt.IsGlobal());
 });
+
+test_f(nw_sync_variable_test, "nw_sync_variable_test.IsDifferent (int) should work fine", function() {
+	svInt.SetValue(10);
+	gmltest_expect_true(svInt.IsDifferent(11));
+	gmltest_expect_false(svInt.IsDifferent(10));
+	gmltest_expect_true(svInt.IsDifferent(10.9));
+	gmltest_expect_false(svInt.IsDifferent(10.1));
+});
+
+test_f(nw_sync_variable_test, "nw_sync_variable_test.AddSerializer (text) should save the new value internally", function() {
+	svText.AddSerializer({
+		Serialize: function(text) {
+			return "T-" + text;	
+		},
+		Deserialize: function(text) {
+			return string_delete(text, 1, 2);
+		}, 
+	});
+	
+	svText.SetValue("hola");
+	
+	var realValue = svText.value;
+	var result = svText.GetValue();
+
+	gmltest_expect_eq("T-hola", realValue);
+	gmltest_expect_eq("hola", result);
+});
