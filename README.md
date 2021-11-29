@@ -43,7 +43,7 @@ Thanks for understanding!
 
 ## Author
 * [Website](https://lrasente.tumblr.com)
-* [Portfolio](https://lcnvdl.github.io)
+* [Portfolio](https://lucho.bio.link)
 
 ## License
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/lcnvdl/gms2-networking/blob/master/LICENSE)
