@@ -21,7 +21,7 @@ networkSettings = {
 };
 
 //
-_clientsMgr = new nw_ClientsManager();
+_clientsMgr = new nw_ClientsManager({ requireWatchPoints: false });
 _sendersMgr = new nw_SendersManager();
 _receiversMgr = new nw_ReceiversManager();
 _rpcMgr = new nw_RpcManager();
@@ -264,13 +264,13 @@ function cleanUpNetworkManager() {
 
 function emitSenderUpdate(packageToSend, senderX, senderY) {
 	if(serverMode) {
-		//	TODO Ver de donde sacar X e Y
+		//	TODO Los clientes deben agregar "WatchPoints", de lo contrario, el broadcast es para todos.
+		
 		nwBroadcastByDistance(
 			NwMessageType.syncObjectUpdate, 
 			packageToSend, 
 			senderX,
 			senderY);
-		// nwBroadcast(NwMessageType.syncObjectUpdate, packageToSend);
 	}
 	else {
 		//	TODO	Do it with some credentials
@@ -294,10 +294,10 @@ function nwBroadcastByDistance(msgId, data, _x, _y) {
 	ds_list_foreach(_clientsMgr.clients, function(client, index, args) {
 		var clientInfo = args.mgr.GetInfo(client);
 		
-		if (point_distance(args.X, args.Y, clientInfo.X, clientInfo.Y) <= clientInfo.Range) {
+		if (clientInfo.CanViewPoint(args.X, args.Y, args.mgr.requireWatchPoints)) {
 			engine.send(sendBuffer, client, args.msgId, args.data);
 		}
-	}, { msgId: msgId, data: data, mgr: _clientsMgr, X: _x, Y: _y })	
+	}, { msgId: msgId, data: data, mgr: _clientsMgr, X: _x, Y: _y });
 }
 
 function nwBroadcast(msgId, data) {
@@ -305,7 +305,7 @@ function nwBroadcast(msgId, data) {
 	
 	ds_list_foreach(_clientsMgr.clients, function(client, index, args) {
 		engine.send(sendBuffer, client, args.msgId, args.data);
-	}, { msgId: msgId, data: data })	
+	}, { msgId: msgId, data: data });
 }
 
 function nwBroadcastExclude(msgId, data, socketsToExclude) {
