@@ -1,8 +1,15 @@
 enum NwMessageType {
+	//	TODO Doc this
 	syncObjectCreate,
+	//	TODO Doc this
 	syncObjectUpdate,
+	//	TODO Doc this
 	syncObjectDelete,
-	syncClientLocation,
+	//	Client watch point create
+	syncClientLocationCreate,
+	//	Client watch point update
+	syncClientLocationUpdate,
+	//	TODO Doc this
 	syncPackage,
 	//	Server-sender to Client-receivers
 	rpcSenderBroadcastCall,

@@ -1,6 +1,9 @@
 //	Globals
 global.nwNetworkManager = id;
-global.nwNetworkManagerFactory = function() { return getGmlNetworkEngine(); };
+
+if (!variable_global_exists("nwNetworkManagerFactory")) {
+	global.nwNetworkManagerFactory = function() { return getGmlNetworkEngine(); };
+}
 
 //	Delta time
 _dt = 0;
@@ -19,6 +22,13 @@ networkSettings = {
 	ip: "127.0.0.1",
 	port: 3456
 };
+
+//	Auto send main watch point (clients)
+autoSendCameraLocation = true;
+autoSendWatchPoint = -1;
+
+//	Default "vision" range
+clientRange = 1000;
 
 //
 _clientsMgr = new nw_ClientsManager({ requireWatchPoints: false });
@@ -49,6 +59,7 @@ function startServer() {
 		serverSocket = engine.serve(networkSettings.port);
 		serverMode = true;
 		offline = false;
+		autoSendWatchPoint = -1;
 		evCall(EV_SERVER_CONNECT);
 	}
 	catch(err) {
@@ -67,6 +78,7 @@ function startClient() {
 		serverSocket = engine.connect(networkSettings.ip, networkSettings.port);
 		serverMode = false;
 		offline = false;
+		autoSendWatchPoint = -1;
 		evCall(EV_CLIENT_CONNECT);
 	}
 	catch(err) {
@@ -417,6 +429,27 @@ function _nwClientProcessPackage(pck) {
 	}
 	else if (pck.id == NwMessageType.syncObjectCreate) {
 	}
+	else if (pck.id == NwMessageType.syncClientLocationCreate) {
+		if(autoSendWatchPoint == 0 && _eventPackage.data.name == "nwCamera") {
+			if (_eventPackage.data.success) {
+				autoSendWatchPoint = 1;	
+			}
+			else {
+				autoSendWatchPoint = -1;	
+			}
+		}
+		//var _socket = global.nwNetworkManager.serverSocket;
+		//var _eventPackage = pck.data;
+		//self.evCallWithArgs("recv-" + _eventPackage.name, { socket: _socket, data: _eventPackage.data });
+	}
+	else if (pck.id == NwMessageType.syncClientLocationUpdate) {
+		if(autoSendWatchPoint == 1 && _eventPackage.data.name == "nwCamera" && !_eventPackage.data.success) {
+			autoSendWatchPoint = -1;	
+		}
+		//var _socket = global.nwNetworkManager.serverSocket;
+		//var _eventPackage = pck.data;
+		//self.evCallWithArgs("recv-" + _eventPackage.name, { socket: _socket, data: _eventPackage.data });
+	}
 	else if (pck.id == NwMessageType.rpcReceiverFunctionCallFindSender) {
 		_rpcMgr.FindSenderAndReply(pck.data);
 	}
@@ -468,10 +501,25 @@ function _onReceiveServerPacket(buffer, socket) {
 		//	Sender (client) calls to receiver (server)
 		_rpcMgr.SenderCallToReceiver(pck.data, socket);
 	}
-	else if (pck.id == NwMessageType.syncClientLocation) {
-		var data = _clientsMgr.GetInfo(socket);
-		data.X = pck.data.X;
-		data.Y = pck.data.Y;
+	else if (pck.id == NwMessageType.syncClientLocationCreate) {
+		var info = _clientsMgr.GetInfo(socket);
+		var wp = info.GetWatchPoint(pck.data.Name);
+		if (is_undefined(wp)) {
+			_clientsMgr.AddWatchPoint(pck.data.Name, pck.data.X, pck.data.Y, pck.data.Range);
+		}
+		nwSend(socket, pck.id, { success: true, name: pck.data.Name });
+	}
+	else if (pck.id == NwMessageType.syncClientLocationUpdate) {
+		var info = _clientsMgr.GetInfo(socket);
+		var wp = info.GetWatchPoint(pck.data.Name);
+		if (is_undefined(wp)) {
+			nwSend(socket, pck.id, { success: false, name: pck.data.Name });
+		}
+		else {
+			data.X = pck.data.X;
+			data.Y = pck.data.Y;
+			nwSend(socket, pck.id, { success: true, name: pck.data.Name });
+		}
 	}
 	else if (pck.id == NwMessageType.syncObjectDelete) {
 		_receiversMgr.DestroyAndDelete(pck.data.uuid);

@@ -1,21 +1,34 @@
 function nw_ClientInfo(_socket) constructor {
-	watchPoints = ds_list_create();
+	watchPoints = ds_map_create();
 	socket = _socket;
 	
-	static AddWatchPoint = function(_x, _y, _range) {
-		ds_list_add(watchPoints, { X: _x, Y: _y, Range: _range });
-		var index = ds_list_size(watchPoints) - 1;
-		return index;
+	static AddWatchPoint = function(_name, _x, _y, _range) {
+		ds_map_add(watchPoints, _name, { X: _x, Y: _y, Range: _range });
+	};
+	
+	static GetWatchPoint = function(name) {
+		return ds_map_find_value(watchPoints, name);
+	};
+	
+	/*static GetWatchPointAt = function(idx) {
+		if (idx >= CountWatchPoints()) {
+			return undefined;
+		}
+		
+		return ds_list_find_value(watchPoints, idx);
+	};*/
+	
+	static CountWatchPoints = function() {
+		return ds_map_size(watchPoints);	
 	};
 	
 	static CanViewPoint = function(_x, _y, _requireWatchPoints) {
-		var sz = ds_list_size(watchPoints);
-		if(sz == 0) {
+		if (CountWatchPoints() == 0) {
 			return !_requireWatchPoints;
 		}
 		
-		for(var i = 0; i < sz; i++) {
-			var wp = ds_list_find_value(watchPoints, i);
+		for (var k = ds_map_find_first(watchPoints); !is_undefined(k); k = ds_map_find_next(watchPoints, k)) {
+			var wp = watchPoints[? k];
 			
 			if (point_distance(wp.X, wp.Y, _x, _y) <= wp.Range) {
 				return true;
@@ -26,6 +39,6 @@ function nw_ClientInfo(_socket) constructor {
 	};
 	
 	static Dispose = function() {
-		ds_list_destroy(watchPoints);
+		ds_map_destroy(watchPoints);
 	};
 }
