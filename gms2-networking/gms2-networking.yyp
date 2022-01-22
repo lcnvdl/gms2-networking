@@ -121,8 +121,8 @@
     "children": [],
   },
   "RoomOrderNodes": [
-    {"roomId":{"name":"nw_test_room","path":"rooms/nw_test_room/nw_test_room.yy",},},
     {"roomId":{"name":"nw_examples_room","path":"rooms/nw_examples_room/nw_examples_room.yy",},},
+    {"roomId":{"name":"nw_test_room","path":"rooms/nw_test_room/nw_test_room.yy",},},
     {"roomId":{"name":"nw_example_1_room","path":"rooms/nw_example_1_room/nw_example_1_room.yy",},},
     {"roomId":{"name":"nw_example_2_room","path":"rooms/nw_example_2_room/nw_example_2_room.yy",},},
     {"roomId":{"name":"nw_example_3_room","path":"rooms/nw_example_3_room/nw_example_3_room.yy",},},

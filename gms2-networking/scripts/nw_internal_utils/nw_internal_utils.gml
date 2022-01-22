@@ -27,7 +27,9 @@ function _nw_smooth_update_entity(syncVar, _instance) {
 			}
 		}
 		else if(syncVar.ValueExists(_instance)) {
-			var currentValue = syncVar.ReadValue(_instance);
+			//	If its a struct SyncVar, gets "{}" and compares against another string (example: "{value:true}").
+			var currentValue = syncVar.ReadValueAsSerialized(_instance);
+			
 			if(currentValue != value) {
 				var newValue = value;
 				
@@ -43,7 +45,7 @@ function _nw_smooth_update_entity(syncVar, _instance) {
 					}
 				}
 				
-				syncVar.ApplyCustomValue(_instance, newValue);
+				syncVar.ApplyValue(_instance, newValue);
 			}
 		}
 	}

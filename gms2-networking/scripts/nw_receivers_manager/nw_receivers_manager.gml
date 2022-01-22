@@ -93,7 +93,8 @@ function nw_ReceiversManager() constructor {
 			}
 				
 			//	New sync var value
-			syncVar.SetValue(varVal);
+			syncVar.SetRawValue(varVal);
+			// syncVar.SetValue(varVal);
 				
 			show_debug_message(varName + "=" + string(varVal));
 		}, existing);

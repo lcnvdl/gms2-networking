@@ -77,6 +77,11 @@ function cm_SyncVariable(_name, _type) constructor {
 		}
 	};
 	
+	static ReadValueAsSerialized = function(_instance) {
+		var _value = ReadValue(_instance);
+		return _InternalSerializeValue(_value);
+	};
+	
 	static ReadValue = function(_instance) {
 		var _value;
 		
@@ -183,7 +188,7 @@ function cm_SyncVariable(_name, _type) constructor {
 		if (type == SV_STRUCT) {
 			var json = is_string(instanceValue) ? instanceValue : json_stringify(instanceValue);
 			
-			return json == value;
+			return json != value;
 		}
 		
 		var realWorldValue = _InternalDeserializeValue(value);
