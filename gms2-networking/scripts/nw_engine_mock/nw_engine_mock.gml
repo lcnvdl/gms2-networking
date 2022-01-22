@@ -1,20 +1,20 @@
 function getMockNetworkEngine() {
-	if(!variable_global_exists("_mockNetworkEngine")) {
-		global._mockNetworkEngine = {
-			currentSocket: 0,
-			sockets: [],
-			newSocket: function(port, _serverIp) {
-				var current = global._mockNetworkEngine.currentSocket++;
-				global._mockNetworkEngine.sockets[current] = {
-					sid: current,
-					serverIp: _serverIp,
-					ip: "127.0.0.1",
-					port: port
-				};
-				return current;
-			}
-		};
-	}
+	global._mockNetworkEngine = {
+		currentSocket: 0,
+		sockets: [],
+		sent: [],
+		recv: [],
+		newSocket: function(port, _serverIp) {
+			var current = global._mockNetworkEngine.currentSocket++;
+			global._mockNetworkEngine.sockets[current] = {
+				sid: current,
+				serverIp: _serverIp,
+				ip: "127.0.0.1",
+				port: port
+			};
+			return current;
+		}
+	};
 	
 	return {
 		serve: _nwMockServe,
@@ -67,7 +67,11 @@ function _nwMockReceive(buffer) {
 	var b64 = buffer_read(buffer, buffer_string);
 	var json = base64_decode(b64);
 	var obj = json_parse(json);
-	return { id: msgId, data: obj };
+	var pck = { id: msgId, data: obj };
+	
+	array_push(global._mockNetworkEngine.recv, { package: pck, buffer: buffer });
+	
+	return pck;
 }
 
 function _nwMockSend(buffer, socket, msgId, package) {
@@ -77,6 +81,7 @@ function _nwMockSend(buffer, socket, msgId, package) {
 	buffer_write(buffer, buffer_u8, msgId);
 	buffer_write(buffer, buffer_string, b64);
 	
+	array_push(global._mockNetworkEngine.sent, { package: package, buffer: buffer });
 	// network_send_packet(socket, buffer, buffer_tell(buffer));
 }
 

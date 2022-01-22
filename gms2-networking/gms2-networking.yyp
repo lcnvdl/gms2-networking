@@ -53,6 +53,7 @@
     {"id":{"name":"readme","path":"notes/readme/readme.yy",},"order":0,},
     {"id":{"name":"nw_network_base_demo","path":"objects/nw_network_base_demo/nw_network_base_demo.yy",},"order":0,},
     {"id":{"name":"nw_server_controller","path":"scripts/nw_server_controller/nw_server_controller.yy",},"order":0,},
+    {"id":{"name":"nw_network_manager_base_test","path":"scripts/nw_network_manager_base_test/nw_network_manager_base_test.yy",},"order":10,},
     {"id":{"name":"nw_sender","path":"scripts/nw_sender/nw_sender.yy",},"order":0,},
     {"id":{"name":"nw_example_3_room","path":"rooms/nw_example_3_room/nw_example_3_room.yy",},"order":2,},
     {"id":{"name":"nw_chat_o","path":"objects/nw_chat_o/nw_chat_o.yy",},"order":2,},
@@ -78,6 +79,7 @@
     {"id":{"name":"nw_network_demo3_o","path":"objects/nw_network_demo3_o/nw_network_demo3_o.yy",},"order":0,},
     {"id":{"name":"struct_extension","path":"scripts/struct_extension/struct_extension.yy",},"order":4,},
     {"id":{"name":"nw_enums","path":"scripts/nw_enums/nw_enums.yy",},"order":0,},
+    {"id":{"name":"nw_protocol_v1","path":"scripts/nw_protocol_v1/nw_protocol_v1.yy",},"order":0,},
     {"id":{"name":"nw_example_4_room","path":"rooms/nw_example_4_room/nw_example_4_room.yy",},"order":4,},
     {"id":{"name":"nw_sync_variable","path":"scripts/nw_sync_variable/nw_sync_variable.yy",},"order":0,},
     {"id":{"name":"nw_client_info","path":"scripts/nw_client_info/nw_client_info.yy",},"order":2,},
@@ -159,6 +161,7 @@
     {"folderPath":"folders/Objects/Gms2_Networking_Examples/Example_5.yy","order":8,"resourceVersion":"1.0","name":"Example_5","tags":[],"resourceType":"GMFolder",},
     {"folderPath":"folders/Scripts/Gms2_Networking_Tests.yy","order":3,"resourceVersion":"1.0","name":"Gms2_Networking_Tests","tags":[],"resourceType":"GMFolder",},
     {"folderPath":"folders/Rooms/Gms2_Networking_Tests.yy","order":3,"resourceVersion":"1.0","name":"Gms2_Networking_Tests","tags":[],"resourceType":"GMFolder",},
+    {"folderPath":"folders/Scripts/Gms2_Networking/Engine/Protocols.yy","order":5,"resourceVersion":"1.0","name":"Protocols","tags":[],"resourceType":"GMFolder",},
   ],
   "AudioGroups": [
     {"targets":-1,"resourceVersion":"1.3","name":"audiogroup_default","resourceType":"GMAudioGroup",},

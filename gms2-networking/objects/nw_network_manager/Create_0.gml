@@ -5,6 +5,10 @@ if (!variable_global_exists("nwNetworkManagerFactory")) {
 	global.nwNetworkManagerFactory = function() { return getGmlNetworkEngine(); };
 }
 
+if (!variable_global_exists("nwNetworkProtocolFactory")) {
+	global.nwNetworkProtocolFactory = function() { return getProtocolV1(); };
+}
+
 //	Delta time
 _dt = 0;
 
@@ -43,6 +47,7 @@ nwCamX = 0;
 nwCamY = 0;
 
 engine = undefined;
+protocol = undefined;
 
 //	Events
 evListener(id);
@@ -246,7 +251,9 @@ function cleanUpNetworkManager() {
 	//	Sockets
 	if (!is_undefined(engine)) {
 		engine.destroyBuffer(sendBuffer);
-		engine.destroySocket(serverSocket);
+		if (serverSocket >= 0) {
+			engine.destroySocket(serverSocket);
+		}
 	}
 
 	//	Server controller
@@ -361,6 +368,7 @@ function _syncNow() {
 
 function _createEngineInstance() {
 	engine = global.nwNetworkManagerFactory();
+	protocol = global.nwNetworkProtocolFactory();
 	sendBuffer = engine.createBuffer(2048, buffer_fixed, 1);
 	
 	assert_is_false(sendBuffer < 0, "Error creating a buffer.");
@@ -422,120 +430,13 @@ function _nwDestroyAllInstancesOfClient(socket) {
 }
 
 function _nwClientProcessPackage(pck) {
-	if (pck.id == NwMessageType.syncPackage) {
-		var _socket = global.nwNetworkManager.serverSocket;
-		var _eventPackage = pck.data;
-		self.evCallWithArgs("recv-" + _eventPackage.name, { socket: _socket, data: _eventPackage.data });
-	}
-	else if (pck.id == NwMessageType.syncObjectCreate) {
-	}
-	else if (pck.id == NwMessageType.syncClientLocationCreate) {
-		if(autoSendWatchPoint == 0 && _eventPackage.data.name == "nwCamera") {
-			if (_eventPackage.data.success) {
-				autoSendWatchPoint = 1;	
-			}
-			else {
-				autoSendWatchPoint = -1;	
-			}
-		}
-		//var _socket = global.nwNetworkManager.serverSocket;
-		//var _eventPackage = pck.data;
-		//self.evCallWithArgs("recv-" + _eventPackage.name, { socket: _socket, data: _eventPackage.data });
-	}
-	else if (pck.id == NwMessageType.syncClientLocationUpdate) {
-		if(autoSendWatchPoint == 1 && _eventPackage.data.name == "nwCamera" && !_eventPackage.data.success) {
-			autoSendWatchPoint = -1;	
-		}
-		//var _socket = global.nwNetworkManager.serverSocket;
-		//var _eventPackage = pck.data;
-		//self.evCallWithArgs("recv-" + _eventPackage.name, { socket: _socket, data: _eventPackage.data });
-	}
-	else if (pck.id == NwMessageType.rpcReceiverFunctionCallFindSender) {
-		_rpcMgr.FindSenderAndReply(pck.data);
-	}
-	else if (pck.id == NwMessageType.rpcSenderBroadcastCall) {
-		_rpcMgr.BroadcastCall(pck.data);
-	}
-	else if (pck.id == NwMessageType.rpcSenderFunctionReply) {
-		_rpcMgr.ReceiveReply(pck.data);
-	}
-	else if (pck.id == NwMessageType.rpcReceiverFunctionReply) {
-		_rpcMgr.ReceiveReply(pck.data);
-	}
-	else if (pck.id == NwMessageType.syncObjectDelete) {
-		_receiversMgr.DestroyAndDelete(pck.data.uuid);
-	}
-	else if (pck.id == NwMessageType.syncObjectUpdate)  {
-		if(!_sendersMgr.Exists(pck.data.uuid)) {
-			_receiversMgr.ReceiveDataFromSender(pck.data, undefined);
-		}
-	}
-	
+	protocol.clientProtocol(id, pck);	
 	self.evCallWithArgs("client-receive", pck);
 }
 
 function _onReceiveServerPacket(buffer, socket) {
 	var pck = engine.receive(buffer);
-	
-	if (pck.id == NwMessageType.syncPackage) {
-		var _eventPackage = pck.data;
-		self.evCallWithArgs("recv-" + _eventPackage.name, { socket: socket, data: _eventPackage.data });
-	}
-	else if (pck.id == NwMessageType.syncObjectCreate) {
-	}
-	else if (pck.id == NwMessageType.rpcSenderBroadcastCall) {
-		_rpcMgr.BroadcastCall(pck.data);
-	}
-	else if (pck.id == NwMessageType.rpcSenderBroadcastReplicate) {
-		_rpcMgr.BroadcastCall(pck.data);
-		_rpcMgr.BroadcastReplicate(pck.data, socket);
-	}
-	else if (pck.id == NwMessageType.rpcReceiverFunctionCall) {
-		//	Receiver (client or server) calls to Sender (server or client)
-		_rpcMgr.ReceiverCallToSender(pck.data, socket);
-	}
-	else if (pck.id == NwMessageType.rpcReceiverFunctionReply) {
-		_rpcMgr.ReceiveReply(pck.data);
-	}
-	else if (pck.id == NwMessageType.rpcSenderFunctionCall) {
-		//	Sender (client) calls to receiver (server)
-		_rpcMgr.SenderCallToReceiver(pck.data, socket);
-	}
-	else if (pck.id == NwMessageType.syncClientLocationCreate) {
-		var info = _clientsMgr.GetInfo(socket);
-		var wp = info.GetWatchPoint(pck.data.Name);
-		if (is_undefined(wp)) {
-			_clientsMgr.AddWatchPoint(pck.data.Name, pck.data.X, pck.data.Y, pck.data.Range);
-		}
-		nwSend(socket, pck.id, { success: true, name: pck.data.Name });
-	}
-	else if (pck.id == NwMessageType.syncClientLocationUpdate) {
-		var info = _clientsMgr.GetInfo(socket);
-		var wp = info.GetWatchPoint(pck.data.Name);
-		if (is_undefined(wp)) {
-			nwSend(socket, pck.id, { success: false, name: pck.data.Name });
-		}
-		else {
-			data.X = pck.data.X;
-			data.Y = pck.data.Y;
-			nwSend(socket, pck.id, { success: true, name: pck.data.Name });
-		}
-	}
-	else if (pck.id == NwMessageType.syncObjectDelete) {
-		_receiversMgr.DestroyAndDelete(pck.data.uuid);
-		nwBroadcast(pck.id, pck.data);	
-	}
-	else if (pck.id == NwMessageType.syncObjectUpdate)  {
-		if(!_sendersMgr.Exists(pck.data.uuid)) {
-			_receiversMgr.ReceiveDataFromSender(pck.data, socket);
-			//	TODO	Validate data
-			nwBroadcast(pck.id, pck.data);
-		}
-		else {
-			//	TODO	Update senders
-		}
-	}
-	
+	protocol.serverProtocol(id, pck, socket);
 	self.evCallWithArgs(EV_SERVER_RECEIVE_PCK, pck);
 }
 
