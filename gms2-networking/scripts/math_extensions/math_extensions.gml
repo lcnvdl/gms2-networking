@@ -87,11 +87,20 @@ function damp_angle(current, target, delta) {
 	return angle;
 }
 
-function damp_angle_2(current, target, delta) {
-	//	TODO	This is not working fine.
-	return median(-delta, delta, angle_difference(current, target));
+///	@function ichance(posibilities)
+/** 
+* @param {real} posibilities - Possibilities to be true (0-100).
+* @return {boolean} True or false.
+*/
+function chance(posibilities) {
+	return random(100) < posibilities;	
 }
 
-function chance(posibilities) {
-	return irandom(100) < posibilities;	
+///	@function ichance(posibilities)
+/** 
+* @param {integer} posibilities - Possibilities to be true (0-100).
+* @return {boolean} True or false.
+*/
+function ichance(posibilities) {
+	return irandom(100) < floor(posibilities);	
 }

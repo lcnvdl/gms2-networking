@@ -4,3 +4,13 @@ function ds_map_foreach(map, fn, _args) {
 	  fn(v, k, _args);
 	}
 }
+
+function auto_ds_map(_cb) {
+	var ds = ds_map_create();
+	try {
+		_cb(ds);
+	}
+	finally {
+		ds_map_destroy(ds);
+	}
+}

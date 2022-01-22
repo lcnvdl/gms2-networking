@@ -2,11 +2,11 @@
   "isDnD": false,
   "isCompatibility": false,
   "parent": {
-    "name": "Utils",
-    "path": "folders/Scripts/Gms2_Common/Utils.yy",
+    "name": "Ds",
+    "path": "folders/Scripts/Gms2_Common/Ds.yy",
   },
   "resourceVersion": "1.0",
-  "name": "view_utils",
+  "name": "array_list_script",
   "tags": [],
   "resourceType": "GMScript",
 }

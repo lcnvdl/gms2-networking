@@ -18,3 +18,13 @@ function ds_queue_firstOrDefault(queue, fn) {
 	
 	return current;
 }
+
+function auto_ds_queue(_cb) {
+	var ds = ds_queue_create();
+	try {
+		_cb(ds);
+	}
+	finally {
+		ds_queue_destroy(ds);
+	}
+}
