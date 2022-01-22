@@ -14,6 +14,12 @@ function cm_SyncVariable(_name, _type) constructor {
 	_isGlobal = undefined;
 	_realName = undefined;
 	
+	static _GenerateInternalSerializers = function() {
+		if (type == SV_STRUCT) {
+			AddSerializer(getJsonSerializer());
+		}
+	};
+	
 	static _CalculateRealName = function() {
 		_isGlobal = string_pos("global.", name) == 1 || string_pos("global__", name);
 		_realName = _isGlobal ? string_replace(name, "global.", "") : name;
@@ -174,6 +180,12 @@ function cm_SyncVariable(_name, _type) constructor {
 			return true;	
 		}
 		
+		if (type == SV_STRUCT) {
+			var json = is_string(instanceValue) ? instanceValue : json_stringify(instanceValue);
+			
+			return json == value;
+		}
+		
 		var realWorldValue = _InternalDeserializeValue(value);
 
 		if (IsNumeric()) {
@@ -190,6 +202,10 @@ function cm_SyncVariable(_name, _type) constructor {
 		}
 		
 		return instanceValue != realWorldValue;
+	};
+	
+	static CountSerializers = function() {
+		return array_length(serializers);		
 	};
 	
 	static ClearSerializers = function() {
@@ -251,4 +267,5 @@ function cm_SyncVariable(_name, _type) constructor {
 	};
 	
 	_CalculateRealName();
+	_GenerateInternalSerializers();
 }

@@ -21,6 +21,12 @@ test_f(nw_sender_test, "nw_sender GetSyncVar should return null if doesn't exist
 	gmltest_expect_true(is_ptr(result));
 });
 
+test_f(nw_sender_test, "nw_sender AddSyncVarStruct should add a serializer", function() {
+	var result = sender.AddSyncVarStruct("inventory");
+	var counter = result.CountSerializers();
+	gmltest_expect_eq(1, counter);
+});
+
 test_f(nw_sender_test, "nw_sender GetSyncVar should work fine", function() {
 	var result = sender.GetSyncVar("x");
 	gmltest_expect_true(!is_ptr(result));

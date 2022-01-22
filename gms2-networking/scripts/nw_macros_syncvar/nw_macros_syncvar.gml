@@ -5,6 +5,7 @@
 #macro SV_DECIMAL "number"
 #macro SV_TEXT "string"
 #macro SV_STRING "string"
+#macro SV_STRUCT "struct"
 
 //	TODO	Implement: SV_LIST, SV_MAP, etc.
 // #macro SV_LIST "list"

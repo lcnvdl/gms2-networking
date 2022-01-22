@@ -54,6 +54,11 @@ function nw_Sender() constructor {
 		return AddSyncVar(syncVar);
 	};
 	
+	static AddSyncVarStruct = function(name) {
+		var syncVar = new cm_SyncVariable(name, SV_STRUCT);
+		return AddSyncVar(syncVar);
+	};
+	
 	static AddSyncVarNumber = function(name, delta) {
 		var syncVar = new cm_SyncVariable(name, SV_INTEGER);
 		syncVar.SetDelta(delta);
