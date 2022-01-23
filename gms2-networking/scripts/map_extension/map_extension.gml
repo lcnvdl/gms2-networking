@@ -5,6 +5,15 @@ function ds_map_foreach(map, fn, _args) {
 	}
 }
 
+function ds_map_to_struct(map) {
+	var struct = {};
+	for (var k = ds_map_find_first(map); !is_undefined(k); k = ds_map_find_next(map, k)) {
+	  var v = map[? k];
+	  struct[$ k] = v;
+	}
+	return struct;
+}
+
 function auto_ds_map(_cb) {
 	var ds = ds_map_create();
 	try {

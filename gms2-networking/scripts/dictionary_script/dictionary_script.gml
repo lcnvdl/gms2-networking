@@ -1,5 +1,5 @@
-function Dictionary() constructor {
-	_data = {};
+function Dictionary(_struct) constructor {
+	_data = is_struct(_struct) ? _struct : {};
 	
 	static Set = function(key, value) {
 		_data[$ key] = value;
@@ -31,6 +31,4 @@ function Dictionary() constructor {
 	static Count = function() {
 		return array_length(variable_struct_get_names(_data));
 	};
-	
-	
 }

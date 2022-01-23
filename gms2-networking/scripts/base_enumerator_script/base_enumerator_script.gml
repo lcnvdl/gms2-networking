@@ -108,12 +108,30 @@ function BaseEnumerator() constructor {
 	
 	//	Convertions
 	
+	static ConvertToDictionary = function(_keySelector, _valueSelector) {
+		var dict = new Dictionary();
+		
+		Reset();
+		
+		while(MoveNext()) {
+			var pair = GetCurrent();
+			var value = is_undefined(_valueSelector) ? pair : _valueSelector(pair);
+			var key = _keySelector(pair);
+			dict.Set(key, value);
+		}
+		
+		return dict;
+	};
+	
 	static ToArrayList = function() {
 		var arrayList = new ArrayList();
+		
 		Reset();
+		
 		while(MoveNext()) {
 			arrayList.Push(GetCurrent());
 		}
+		
 		return arrayList;
 	};
 	

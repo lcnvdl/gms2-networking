@@ -1,4 +1,4 @@
-function DictionaryEnumerator(_dictionary) : BaseEnumerator() constructor {
+function DictionaryEnumerator(_dictionary) : OrderedEnumerator() constructor {
 	_ds = _dictionary;
 	_position = -1;
 	

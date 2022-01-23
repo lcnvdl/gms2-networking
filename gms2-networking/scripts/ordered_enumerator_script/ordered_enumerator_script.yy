@@ -2,11 +2,11 @@
   "isDnD": false,
   "isCompatibility": false,
   "parent": {
-    "name": "Enumerators",
-    "path": "folders/Scripts/Gms2_Common/Ds/Enumerators.yy",
+    "name": "Base",
+    "path": "folders/Scripts/Gms2_Common/Ds/Base.yy",
   },
   "resourceVersion": "1.0",
-  "name": "ds_list_enumerator_script",
+  "name": "ordered_enumerator_script",
   "tags": [],
   "resourceType": "GMScript",
 }
