@@ -8,3 +8,5 @@
 #macro EV_SOCKET_DISCONNECT "disconnect"
 //	On receive a package (server)
 #macro EV_SERVER_RECEIVE_PCK "server-receive"
+//	On receive a package (client)
+#macro EV_CLIENT_RECEIVE_PCK "client-receive"

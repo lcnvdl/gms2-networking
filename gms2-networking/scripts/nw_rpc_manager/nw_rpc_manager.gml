@@ -13,7 +13,7 @@ function nw_RpcManager() constructor {
 	}
 	
 	static BroadcastReplicate = function(pck, socket) {
-		nw_broadcast_exclude(pck.fn, pck.args, [socket]);
+		nw_broadcast_exclude(pck.fn, pck.args, [socket], NwMessageType.rpcSenderBroadcastCall);
 	}
 	
 	static ReceiverCallToSender = function(pck, socket) {

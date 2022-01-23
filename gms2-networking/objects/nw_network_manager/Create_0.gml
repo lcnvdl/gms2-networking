@@ -113,7 +113,7 @@ function nwRegisterObjectAsSyncSender(instance, _uuid, _opts) {
 	return newId;
 }
 
-function nwSendBroadcastExclude(_name, _data, exclude) {
+function nwSendBroadcastExclude(_name, _data, exclude, msgType) {
 	assert_is_not_undefined(_data);
 	assert_is_string(_name, "nwSendBroadcastExclude: invalid parameter 'name'");
 	assert_is_array(exclude);
@@ -123,7 +123,7 @@ function nwSendBroadcastExclude(_name, _data, exclude) {
 		data: _data
 	};
 	
-	nwBroadcastExclude(NwMessageType.syncPackage, _package, exclude);
+	nwBroadcastExclude(is_undefined(msgType) ? NwMessageType.syncPackage : msgType, _package, exclude);
 }
 
 function nwSendBroadcast(_name, _data) {
@@ -335,6 +335,7 @@ function nwBroadcastExclude(msgId, data, socketsToExclude) {
 			return v == _client;
 		}, client);
 		
+		//	Si no está excluido
 		if (idx == -1) {
 			engine.send(sendBuffer, client, args.msgId, args.data);
 		}
@@ -431,7 +432,7 @@ function _nwDestroyAllInstancesOfClient(socket) {
 
 function _nwClientProcessPackage(pck) {
 	protocol.clientProtocol(id, pck);	
-	self.evCallWithArgs("client-receive", pck);
+	self.evCallWithArgs(EV_CLIENT_RECEIVE_PCK, pck);
 }
 
 function _onReceiveServerPacket(buffer, socket) {
@@ -441,7 +442,4 @@ function _onReceiveServerPacket(buffer, socket) {
 }
 
 #endregion	//	Private functions
-
-
-
 

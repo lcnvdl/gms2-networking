@@ -23,12 +23,17 @@ function nw_ClientsManager(_settings) constructor {
 	};
 	
 	static Dispose = function() {
+		if(is_undefined(clients)) {
+			return;	
+		}
+		
 		ds_map_foreach(clientsInfo, function(client, _socket) {
 			client.Dispose();
 		});
 		
 		ds_list_destroy(clients);
 		ds_map_destroy(clientsInfo);
+		clients = undefined;
 	};
 }
 

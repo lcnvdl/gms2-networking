@@ -57,11 +57,12 @@ function nw_broadcast(eventName, data) {
 ///	@param {string} eventName - Name that identifies the event.
 ///	@param {struct} data - Struct to send.
 ///	@param {array} exclude - List of sockets to exclude.
+///	@param {number} [msgType] - Message type (optional).
 ///	@return {boolean} True 
-function nw_broadcast_exclude(eventName, data, exclude) {
+function nw_broadcast_exclude(eventName, data, exclude, msgType) {
 	assert_is_string(eventName, "nw_broadcast_exclude: invalid parameter 'eventName'");
 	assert_is_true(nw_is_server());
-	global.nwNetworkManager.nwSendBroadcastExclude(eventName, data, exclude);
+	global.nwNetworkManager.nwSendBroadcastExclude(eventName, data, exclude, msgType);
 	return true;
 }
 
