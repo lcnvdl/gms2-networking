@@ -2,7 +2,7 @@
 Auto-magic Networking System for Game Maker Studio +2.3.
 
 ## Features
-* **Auto-magic synchronization between objects**. _There is no longer a need to invent new protocols or mess up your code._
+* **Auto-magic synchronization between objects**. _No more need to invent new protocols or mess up your code._
 * **Smooth synchronization**. _Latency is hidden by using a smooth value assignment algorithm._
 * **Security layer**. _You can add server-side validations to prevent cheating._
 * **Independent of the network engine**. _You can use a base class to implement your preferred network engine. For my own project I used Http2 sockets!_
