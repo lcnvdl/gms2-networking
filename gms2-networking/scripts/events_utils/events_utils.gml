@@ -40,10 +40,7 @@ function evListener(instance){
 				}
 			}, { evName:evName, _args:_args });
 			
-			//	TODO	Optimize
-			ds_list_removeAll(subscriptions, function(value, idx, __args) {
-				return value.ttl == 0;
-			}, undefined);
+			removeExpiredSubscriptions();
 		}
 
 		function evCall(evName) {
@@ -60,9 +57,13 @@ function evListener(instance){
 				}
 			}
 			
+			removeExpiredSubscriptions();
+		}
+		
+		function removeExpiredSubscriptions() {
 			//	TODO	Optimize
 			ds_list_removeAll(subscriptions, function(value, idx, __args) {
-				return value.ttl == 0;
+				return (value.ttl == 0) ? value : pointer_null;
 			}, undefined);
 		}
 		
