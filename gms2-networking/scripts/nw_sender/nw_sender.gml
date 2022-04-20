@@ -71,7 +71,7 @@ function nw_Sender() constructor {
 	};
 	
 	static GetSyncVar = function(varName) {
-		var ix = ds_list_findIndex(syncVariables, function(val, __i, _name) {
+		var ix = ds_list_findIndexOf(syncVariables, function(val, __i, _name) {
 			return val.name == _name;
 		}, varName);
 	

@@ -33,10 +33,11 @@ function smooth_damp(current, target, dampSpeed) {
 	}
 }
 
-function damp_angle(current, target, delta) {
+function damp_angle(current, _target, delta) {
 	var tempdir;
-	var diff = abs(target-current);
-	var angle = current;
+	var target = round(_target) mod 360;
+	var angle = round(current) mod 360;
+	var diff = abs(target-angle);
 	
 	if (diff > 180)
 	{
@@ -103,4 +104,22 @@ function chance(posibilities) {
 */
 function ichance(posibilities) {
 	return irandom(100) < floor(posibilities);	
+}
+
+///	@function choose_weighted(value1, weight1, ...)
+function choose_weighted() {
+    var n = 0;
+    for (var i = 1; i < argument_count; i += 2) {
+        if (argument[i] <= 0) continue;
+        n += argument[i];
+    }
+    
+    n = random(n);
+    for (var i = 1; i < argument_count; i += 2) {
+        if (argument[i] <= 0) continue;
+        n -= argument[i];
+        if (n < 0) return argument[i - 1];
+    }
+    
+    return argument[0];
 }

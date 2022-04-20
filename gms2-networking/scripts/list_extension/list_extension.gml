@@ -15,13 +15,38 @@ function ds_list_toArray(list) {
 }
 
 function ds_list_removeAll(list, fn, args) {
-	while(ds_list_findIndex(list, fn, args) >= 0) {
-		var ix = ds_list_findIndex(list, fn, args);
+	while(ds_list_findIndexOf(list, fn, args) >= 0) {
+		var ix = ds_list_findIndexOf(list, fn, args);
 		ds_list_delete(list, ix);
 	}
 }
 
+function ds_list_findIndexOfValue(list, fn, args) {
+	var i;
+	for(i = 0; i < ds_list_size(list); i++) {
+		var result = fn(ds_list_find_value(list, i), i, args);
+		if (!is_undefined(result) && result != pointer_null) {
+			return i;	
+		}
+	}
+	
+	return -1;
+}
+
+function ds_list_findIndexOf(list, fn, args) {
+	var i;
+	for(i = 0; i < ds_list_size(list); i++) {
+		var result = fn(ds_list_find_value(list, i), i, args);
+		if (result) {
+			return i;	
+		}
+	}
+	
+	return -1;
+}
+
 function ds_list_findIndex(list, fn, args) {
+	show_debug_message("DEPRECATED: Use findIndexOfValue or findIndexIf");
 	var i;
 	for(i = 0; i < ds_list_size(list); i++) {
 		var result = fn(ds_list_find_value(list, i), i, args);

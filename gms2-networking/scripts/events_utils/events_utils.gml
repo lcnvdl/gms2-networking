@@ -18,7 +18,7 @@ function evListener(instance){
 				return;	
 			}
 			
-			var pos = ds_list_findIndex(subscriptions, function(m, __i, _subscriptionId){
+			var pos = ds_list_findIndexOf(subscriptions, function(m, __i, _subscriptionId){
 				return m.id == _subscriptionId;
 			}, subscriptionId);
 	

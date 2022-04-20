@@ -77,7 +77,7 @@ function nw_ReceiversManager() constructor {
 		//	TODO	Assign syncVariables
 		struct_foreach(info.variables, function(varVal, varName, _existing) {
 			var syncVar = _existing.GetSyncVar(varName);
-				
+			
 			assert_is_not_undefined(syncVar, "The variable " + varName + " is missing.");
 				
 			//	Server validators

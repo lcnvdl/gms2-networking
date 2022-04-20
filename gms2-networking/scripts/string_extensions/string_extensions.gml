@@ -104,3 +104,16 @@ function string_trim() {
 
 	return newString;
 }
+
+function string_ends_with_char(str, endChar) {
+	return string_char_at(str, string_length(str)) == endChar;
+}
+
+function string_starts_with(str, text) {
+	return string_pos(text, str) == 1;
+}
+
+function string_ends_with(str, text) {
+	var expectedIndex = 1 + string_length(str) - string_length(text);
+	return string_pos(text, str) == expectedIndex;
+}
